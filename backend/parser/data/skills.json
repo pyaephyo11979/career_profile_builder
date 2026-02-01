@@ -1,0 +1,130 @@
+{
+  "programming_languages": [
+    "Python",
+    "JavaScript",
+    "TypeScript",
+    "PHP",
+    "Java",
+    "C#",
+    "C++",
+    "Go",
+    "Ruby",
+    "Swift",
+    "Kotlin",
+    "Rust",
+    "SQL"
+  ],
+  "frameworks": [
+    "Django",
+    "Flask",
+    "FastAPI",
+    "React",
+    "React Native",
+    "Vue.js",
+    "Angular",
+    "Laravel",
+    "Symfony",
+    "Spring Boot",
+    "Express",
+    "Nest.js",
+    "Next.js"
+  ],
+  "cloud_platforms": [
+    "AWS",
+    "Azure",
+    "Google Cloud",
+    "Firebase",
+    "Heroku",
+    "DigitalOcean"
+  ],
+  "devops_tools": [
+    "Docker",
+    "Kubernetes",
+    "Terraform",
+    "Ansible",
+    "GitHub Actions",
+    "GitLab CI",
+    "CircleCI",
+    "Jenkins"
+  ],
+  "databases": [
+    "MySQL",
+    "PostgreSQL",
+    "MongoDB",
+    "SQLite",
+    "Oracle",
+    "SQL Server",
+    "Redis",
+    "Cassandra"
+  ],
+  "data_science": [
+    "Pandas",
+    "NumPy",
+    "SciPy",
+    "scikit-learn",
+    "TensorFlow",
+    "PyTorch",
+    "Keras",
+    "Matplotlib",
+    "Tableau",
+    "Power BI"
+  ],
+  "testing": [
+    "PyTest",
+    "Jest",
+    "JUnit",
+    "Selenium",
+    "Cypress",
+    "Playwright"
+  ],
+  "tools": [
+    "Git",
+    "GitHub",
+    "GitLab",
+    "Bitbucket",
+    "Linux",
+    "REST",
+    "GraphQL",
+    "JWT",
+    "Postman",
+    "Figma"
+  ],
+  "basic_skills": [
+    "HTML",
+    "CSS",
+    "Sass",
+    "Responsive Design",
+    "Data Structures",
+    "Algorithms",
+    "Microsoft Office",
+    "Google Workspace"
+  ],
+  "soft_skills": [
+    "Problem Solving",
+    "Teamwork",
+    "Communication",
+    "Adaptability",
+    "Time Management",
+    "Leadership",
+    "Mentoring",
+    "Stakeholder Management"
+  ],
+  "product_skills": [
+    "Agile",
+    "Scrum",
+    "Kanban",
+    "Product Discovery",
+    "Roadmapping",
+    "Design Thinking"
+  ],
+  "languages": [
+    "English",
+    "Spanish",
+    "French",
+    "Burmese",
+    "Chinese",
+    "German",
+    "Hindi",
+    "Japanese"
+  ]
+}
