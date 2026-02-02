@@ -7,7 +7,7 @@ export default function HeroSection() {
         <div className="mx-auto max-w-[1200px] px-6">
           <div className="py-[80px] md:py-[96px] pb-[120px] md:pb-[140px]">
             <h1 className="text-white text-[44px] md:text-[56px] font-semibold tracking-[-0.02em]">
-              Resume Parser
+              Career Profile builder
             </h1>
 
             <p className="mt-6 max-w-[840px] text-white/90 text-[16px] md:text-[18px] leading-7">

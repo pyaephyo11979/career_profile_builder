@@ -8,7 +8,7 @@ export default function Navbar() {
           {/* Left: Brand (kept minimal like screenshot) */}
           <div className="flex items-center gap-6">
             <div className="hidden md:flex items-center gap-8">
-              <Link to="/" className="text-[20px] font-semibold"> Home </Link>
+              <Link to="/" className="text-[20px] font-semibold"> Career Profile Builder </Link>
             </div>
           </div>
 
