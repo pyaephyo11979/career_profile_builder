@@ -1,0 +1,466 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "username": "demo",
+      "email": "demo@example.com",
+      "password": "minimum-8-chars"
+    },
+    {
+      "id": 2,
+      "username": "jane",
+      "email": "jane@example.com",
+      "password": "minimum-8-chars"
+    }
+  ],
+  "resumes": [
+    {
+      "id": 1,
+      "userId": 1,
+      "file_name": "resume.pdf",
+      "raw_text": "Full extracted text...",
+      "parsed_data": {
+        "resume_id": 12,
+        "contact": {
+          "name": "Jane Doe",
+          "email": "jane@example.com",
+          "phone": "+1 555 123 4567",
+          "links": {
+            "linkedin": "https://linkedin.com/in/janedoe",
+            "github": "https://github.com/janedoe",
+            "portfolio": null,
+            "other": []
+          }
+        },
+        "sections_found": ["contact", "skills", "experience", "projects", "education"],
+        "skills": {
+          "categories": {
+            "programming": ["Python", "JavaScript"],
+            "cloud": ["AWS"],
+            "databases": []
+          },
+          "confidence": 0.75
+        },
+        "projects": [
+          {
+            "name": "Smart Hiring Platform",
+            "summary": "Internal ATS that ranks applicants via NLP scoring.",
+            "highlights": ["Reduced screening time by 60%"],
+            "tech_stack": ["Python", "React", "PostgreSQL"],
+            "links": ["https://github.com/acme/ats"]
+          }
+        ],
+        "education": [
+          {
+            "school": "ABC University",
+            "degree": "BSc",
+            "field": null,
+            "start_year": "2015",
+            "end_year": "2019"
+          }
+        ],
+        "experience": [
+          {
+            "title": "Software Engineer",
+            "company": "ACME Corp",
+            "start_date": null,
+            "end_date": null,
+            "location": null,
+            "highlights": ["Reduced build time by 40%", "Led migration to AWS"]
+          }
+        ],
+        "confidence": {
+          "email": 0.99,
+          "phone": 0.85,
+          "links": 0.9,
+          "name": 0.6
+        },
+        "resume_health": {
+          "score": 70,
+          "strengths": ["Email detected"],
+          "warnings": ["Skills list is short"],
+          "suggestions": ["Add more relevant skills (tools, frameworks, databases)."]
+        }
+      },
+      "resume_health": {
+        "score": 70,
+        "strengths": ["Email detected"],
+        "warnings": ["Skills list is short"],
+        "suggestions": ["Add more relevant skills (tools, frameworks, databases)."]
+      },
+      "is_confirmed": false,
+      "created_at": "2026-01-31T10:04:27Z",
+      "updated_at": "2026-01-31T10:04:27Z"
+    },
+    {
+      "id": 42,
+      "userId": 1,
+      "file_name": "jordan_resume.docx",
+      "raw_text": "...full document text...",
+      "parsed_data": {
+        "resume_id": 42,
+        "contact": {
+          "name": "Jordan Chen",
+          "email": "jordan@example.com",
+          "phone": "+1 555 222 1111",
+          "links": {
+            "linkedin": "https://www.linkedin.com/in/jordanchen",
+            "github": "https://github.com/jordanchen",
+            "portfolio": "https://jordanchen.dev",
+            "other": ["https://medium.com/@jordanchen"]
+          }
+        },
+        "sections_found": [
+          "summary",
+          "skills",
+          "experience",
+          "projects",
+          "education",
+          "certifications",
+          "awards",
+          "references"
+        ],
+        "skills": {
+          "categories": {
+            "programming_languages": ["Python", "Go", "TypeScript"],
+            "frameworks": ["Django", "FastAPI", "React"],
+            "cloud_platforms": ["AWS"],
+            "devops_tools": ["Docker", "Terraform"],
+            "databases": ["PostgreSQL", "MongoDB"],
+            "data_science": [],
+            "testing": ["PyTest", "Jest"],
+            "tools": ["GitHub", "GraphQL", "Postman"],
+            "basic_skills": ["HTML", "Responsive Design"],
+            "soft_skills": ["Leadership", "Communication"],
+            "product_skills": ["Agile", "Kanban"],
+            "languages": ["English", "Japanese"]
+          },
+          "confidence": 0.81
+        },
+        "projects": [
+          {
+            "name": "Data Observability Hub",
+            "summary": "Self-serve dashboards surfacing freshness SLAs across 120+ pipelines.",
+            "highlights": ["Cut incident MTTR from 4h to 55m", "Drove stakeholder adoption across 7 teams"],
+            "tech_stack": ["Python", "TypeScript", "React", "PostgreSQL", "Docker"],
+            "links": ["https://github.com/jordanchen/data-obs"]
+          }
+        ],
+        "education": [
+          {
+            "school": "UC Berkeley",
+            "degree": "BSc",
+            "field": "Computer Science",
+            "start_year": "2014",
+            "end_year": "2018"
+          }
+        ],
+        "experience": [
+          {
+            "title": "Lead Backend Engineer",
+            "company": "RocketOps",
+            "start_date": "Jan 2022",
+            "end_date": "Present",
+            "location": "Remote",
+            "highlights": ["Scaled ingestion pipeline to 50M events/day", "Led 6-engineer squad across 3 timezones"]
+          }
+        ],
+        "confidence": {
+          "email": 0.99,
+          "phone": 0.82,
+          "links": 0.92,
+          "name": 0.65
+        },
+        "resume_health": {
+          "score": 88,
+          "strengths": [
+            "Email detected",
+            "Skills section looks strong",
+            "Experience detected",
+            "Includes quantified achievements"
+          ],
+          "warnings": ["No GitHub/LinkedIn detected"],
+          "suggestions": ["Add GitHub and/or LinkedIn links to improve credibility."]
+        }
+      },
+      "resume_health": {
+        "score": 88,
+        "strengths": [
+          "Email detected",
+          "Skills section looks strong",
+          "Experience detected",
+          "Includes quantified achievements"
+        ],
+        "warnings": ["No GitHub/LinkedIn detected"],
+        "suggestions": ["Add GitHub and/or LinkedIn links to improve credibility."]
+      },
+      "is_confirmed": true,
+      "created_at": "2026-02-01T08:20:10Z",
+      "updated_at": "2026-02-01T08:40:10Z"
+    },
+    {
+      "id": 77,
+      "userId": 2,
+      "file_name": "jane_resume.pdf",
+      "raw_text": "Jane's resume raw text...",
+      "parsed_data": {
+        "resume_id": 77,
+        "contact": {
+          "name": "Jane Smith",
+          "email": "jane@example.com",
+          "phone": null,
+          "links": {
+            "linkedin": null,
+            "github": null,
+            "portfolio": null,
+            "other": []
+          }
+        },
+        "sections_found": ["contact", "skills"],
+        "skills": {
+          "categories": { "programming": ["JavaScript", "React"], "tools": ["Git"] },
+          "confidence": 0.62
+        },
+        "resume_health": {
+          "score": 62,
+          "strengths": ["Email detected"],
+          "warnings": ["Missing links (GitHub/LinkedIn)"],
+          "suggestions": ["Add GitHub and LinkedIn links.", "Add work experience section."]
+        }
+      },
+      "resume_health": {
+        "score": 62,
+        "strengths": ["Email detected"],
+        "warnings": ["Missing links (GitHub/LinkedIn)"],
+        "suggestions": ["Add GitHub and LinkedIn links.", "Add work experience section."]
+      },
+      "is_confirmed": false,
+      "created_at": "2026-02-02T07:10:00Z",
+      "updated_at": "2026-02-02T07:10:00Z"
+    },
+    {
+      "id": 2,
+      "userId": 1,
+      "file_name": "resume.pdf",
+      "raw_text": "Full extracted text...",
+      "parsed_data": {
+        "resume_id": 12,
+        "contact": {
+          "name": "Jane Doe",
+          "email": "jane@example.com",
+          "phone": "+1 555 123 4567",
+          "links": {
+            "linkedin": "https://linkedin.com/in/janedoe",
+            "github": "https://github.com/janedoe",
+            "portfolio": null,
+            "other": []
+          }
+        },
+        "sections_found": ["contact", "skills", "experience", "projects", "education"],
+        "skills": {
+          "categories": {
+            "programming": ["Python", "JavaScript"],
+            "cloud": ["AWS"],
+            "databases": []
+          },
+          "confidence": 0.75
+        },
+        "projects": [
+          {
+            "name": "Smart Hiring Platform",
+            "summary": "Internal ATS that ranks applicants via NLP scoring.",
+            "highlights": ["Reduced screening time by 60%"],
+            "tech_stack": ["Python", "React", "PostgreSQL"],
+            "links": ["https://github.com/acme/ats"]
+          }
+        ],
+        "education": [
+          {
+            "school": "ABC University",
+            "degree": "BSc",
+            "field": null,
+            "start_year": "2015",
+            "end_year": "2019"
+          }
+        ],
+        "experience": [
+          {
+            "title": "Software Engineer",
+            "company": "ACME Corp",
+            "start_date": null,
+            "end_date": null,
+            "location": null,
+            "highlights": ["Reduced build time by 40%", "Led migration to AWS"]
+          }
+        ],
+        "confidence": {
+          "email": 0.99,
+          "phone": 0.85,
+          "links": 0.9,
+          "name": 0.6
+        },
+        "resume_health": {
+          "score": 70,
+          "strengths": ["Email detected"],
+          "warnings": ["Skills list is short"],
+          "suggestions": ["Add more relevant skills (tools, frameworks, databases)."]
+        }
+      },
+      "resume_health": {
+        "score": 70,
+        "strengths": ["Email detected"],
+        "warnings": ["Skills list is short"],
+        "suggestions": ["Add more relevant skills (tools, frameworks, databases)."]
+      },
+      "is_confirmed": false,
+      "created_at": "2026-01-31T10:04:27Z",
+      "updated_at": "2026-01-31T10:04:27Z"
+    },
+    {
+      "id": 42,
+      "userId": 1,
+      "file_name": "jordan_resume.docx",
+      "raw_text": "...full document text...",
+      "parsed_data": {
+        "resume_id": 42,
+        "contact": {
+          "name": "Jordan Chen",
+          "email": "jordan@example.com",
+          "phone": "+1 555 222 1111",
+          "links": {
+            "linkedin": "https://www.linkedin.com/in/jordanchen",
+            "github": "https://github.com/jordanchen",
+            "portfolio": "https://jordanchen.dev",
+            "other": ["https://medium.com/@jordanchen"]
+          }
+        },
+        "sections_found": [
+          "summary",
+          "skills",
+          "experience",
+          "projects",
+          "education",
+          "certifications",
+          "awards",
+          "references"
+        ],
+        "skills": {
+          "categories": {
+            "programming_languages": ["Python", "Go", "TypeScript"],
+            "frameworks": ["Django", "FastAPI", "React"],
+            "cloud_platforms": ["AWS"],
+            "devops_tools": ["Docker", "Terraform"],
+            "databases": ["PostgreSQL", "MongoDB"],
+            "data_science": [],
+            "testing": ["PyTest", "Jest"],
+            "tools": ["GitHub", "GraphQL", "Postman"],
+            "basic_skills": ["HTML", "Responsive Design"],
+            "soft_skills": ["Leadership", "Communication"],
+            "product_skills": ["Agile", "Kanban"],
+            "languages": ["English", "Japanese"]
+          },
+          "confidence": 0.81
+        },
+        "projects": [
+          {
+            "name": "Data Observability Hub",
+            "summary": "Self-serve dashboards surfacing freshness SLAs across 120+ pipelines.",
+            "highlights": ["Cut incident MTTR from 4h to 55m", "Drove stakeholder adoption across 7 teams"],
+            "tech_stack": ["Python", "TypeScript", "React", "PostgreSQL", "Docker"],
+            "links": ["https://github.com/jordanchen/data-obs"]
+          }
+        ],
+        "education": [
+          {
+            "school": "UC Berkeley",
+            "degree": "BSc",
+            "field": "Computer Science",
+            "start_year": "2014",
+            "end_year": "2018"
+          }
+        ],
+        "experience": [
+          {
+            "title": "Lead Backend Engineer",
+            "company": "RocketOps",
+            "start_date": "Jan 2022",
+            "end_date": "Present",
+            "location": "Remote",
+            "highlights": ["Scaled ingestion pipeline to 50M events/day", "Led 6-engineer squad across 3 timezones"]
+          }
+        ],
+        "confidence": {
+          "email": 0.99,
+          "phone": 0.82,
+          "links": 0.92,
+          "name": 0.65
+        },
+        "resume_health": {
+          "score": 88,
+          "strengths": [
+            "Email detected",
+            "Skills section looks strong",
+            "Experience detected",
+            "Includes quantified achievements"
+          ],
+          "warnings": ["No GitHub/LinkedIn detected"],
+          "suggestions": ["Add GitHub and/or LinkedIn links to improve credibility."]
+        }
+      },
+      "resume_health": {
+        "score": 88,
+        "strengths": [
+          "Email detected",
+          "Skills section looks strong",
+          "Experience detected",
+          "Includes quantified achievements"
+        ],
+        "warnings": ["No GitHub/LinkedIn detected"],
+        "suggestions": ["Add GitHub and/or LinkedIn links to improve credibility."]
+      },
+      "is_confirmed": true,
+      "created_at": "2026-02-01T08:20:10Z",
+      "updated_at": "2026-02-01T08:40:10Z"
+    },
+    {
+      "id": 77,
+      "userId": 2,
+      "file_name": "jane_resume.pdf",
+      "raw_text": "Jane's resume raw text...",
+      "parsed_data": {
+        "resume_id": 77,
+        "contact": {
+          "name": "Jane Smith",
+          "email": "jane@example.com",
+          "phone": null,
+          "links": {
+            "linkedin": null,
+            "github": null,
+            "portfolio": null,
+            "other": []
+          }
+        },
+        "sections_found": ["contact", "skills"],
+        "skills": {
+          "categories": { "programming": ["JavaScript", "React"], "tools": ["Git"] },
+          "confidence": 0.62
+        },
+        "resume_health": {
+          "score": 62,
+          "strengths": ["Email detected"],
+          "warnings": ["Missing links (GitHub/LinkedIn)"],
+          "suggestions": ["Add GitHub and LinkedIn links.", "Add work experience section."]
+        }
+      },
+      "resume_health": {
+        "score": 62,
+        "strengths": ["Email detected"],
+        "warnings": ["Missing links (GitHub/LinkedIn)"],
+        "suggestions": ["Add GitHub and LinkedIn links.", "Add work experience section."]
+      },
+      "is_confirmed": false,
+      "created_at": "2026-02-02T07:10:00Z",
+      "updated_at": "2026-02-02T07:10:00Z"
+    }
+  ]
+}
