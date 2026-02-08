@@ -128,9 +128,6 @@ export default function UploadPage() {
                   <h2 className="text-sm font-medium text-slate-900">
                     Preview
                   </h2>
-                  <p className="mt-1 text-xs text-slate-500">
-                    UI placeholder (no API integration).
-                  </p>
                 </div>
 
                 <span className="rounded-full bg-indigo-50 px-2 py-1 text-xs font-medium text-indigo-700">
@@ -189,64 +186,6 @@ export default function UploadPage() {
                         Ready
                       </span>
                     </div>
-                  </div>
-
-                  {/* Fake parsed sections */}
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <div className="rounded-2xl border border-slate-200 p-4">
-                      <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
-                        Contact
-                      </p>
-                      <div className="mt-3 space-y-2 text-sm">
-                        <div className="flex items-center justify-between gap-3">
-                          <span className="text-slate-600">Name</span>
-                          <span className="font-medium text-slate-900">—</span>
-                        </div>
-                        <div className="flex items-center justify-between gap-3">
-                          <span className="text-slate-600">Email</span>
-                          <span className="font-medium text-slate-900">—</span>
-                        </div>
-                        <div className="flex items-center justify-between gap-3">
-                          <span className="text-slate-600">Phone</span>
-                          <span className="font-medium text-slate-900">—</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="rounded-2xl border border-slate-200 p-4">
-                      <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
-                        Resume health
-                      </p>
-                      <div className="mt-3">
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm text-slate-600">Score</span>
-                          <span className="text-sm font-medium text-slate-900">
-                            —
-                          </span>
-                        </div>
-                        <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-slate-100">
-                          <div className="h-full w-1/3 rounded-full bg-slate-900" />
-                        </div>
-                        <p className="mt-2 text-xs text-slate-500">
-                          Placeholder progress bar.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Placeholder JSON */}
-                  <div>
-                    <p className="mb-2 text-xs font-medium uppercase tracking-wide text-slate-500">
-                      Parsed JSON (placeholder)
-                    </p>
-                    <pre className="max-h-[320px] overflow-auto rounded-2xl border border-slate-200 bg-slate-950 p-4 text-xs text-slate-100">
-                      {`{
-  "resume_id": 123,
-  "contact": { "name": "...", "email": "...", "phone": "..." },
-  "skills": { "categories": { "programming": ["..."] }, "confidence": 0.8 },
-  "resume_health": { "score": 85 }
-}`}
-                    </pre>
                   </div>
                 </div>
               )}
