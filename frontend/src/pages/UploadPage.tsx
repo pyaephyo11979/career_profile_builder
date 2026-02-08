@@ -1,13 +1,34 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 
 export default function UploadPage() {
   const [file, setFile] = useState<File | null>(null);
+  const [preview, setPreview] = useState("");
 
   const fileHint = useMemo(() => {
     if (!file) return "PDF or DOCX only. Max 5MB.";
     const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
     return `${file.name} • ${sizeMb} MB`;
   }, [file]);
+
+  const handleFileChange = (e) => {
+    setFile(e.target.files[0]);
+  };
+
+  useEffect(() => {
+    if (file) {
+      handlePreviewFile(file);
+    }else{
+      setPreview("");
+    }
+  }, [file]);
+
+  let handlePreviewFile = (file) => {
+    let reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => {
+      setPreview(reader.result);
+    };
+  };
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -82,7 +103,7 @@ export default function UploadPage() {
                   <input
                     type="file"
                     accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                    onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+                    onChange={handleFileChange}
                     className="mt-4 block w-full cursor-pointer rounded-xl border border-slate-200 bg-white text-sm text-slate-700
                                file:mr-4 file:rounded-lg file:border-0 file:bg-slate-900 file:px-4 file:py-2 file:text-sm file:font-medium file:text-white
                                hover:file:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-400"
@@ -134,6 +155,17 @@ export default function UploadPage() {
                   Demo
                 </span>
               </div>
+
+              {preview && (
+                <iframe
+                  src={preview}
+                  className="mt-6 h-[600px] w-full rounded-xl border border-slate-200 bg-slate-50"
+                  title="Resume Preview"
+                >
+                  This browser does not support PDFs. Please download the PDF to
+                  view it: <a href={preview} download="resume.pdf">Download PDF</a>
+                </iframe>
+              )}
 
               {!file ? (
                 <div className="mt-6 rounded-2xl border border-dashed border-slate-200 p-10 text-center">
