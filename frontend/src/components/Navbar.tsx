@@ -2,30 +2,29 @@ import { Link } from "react-router-dom";
 
 export default function Navbar() {
   return (
-    <header className="w-full bg-white border-b border-[#EEF2F7]">
-      <div className="mx-auto max-w-[1200px] px-6">
-        <div className="h-[72px] flex items-center justify-between">
-          {/* Left: Brand (kept minimal like screenshot) */}
+    <header className="w-full pt-6 bg-[#F3F5F7] flex justify-center">
+      <div className="mx-auto w-full max-w-[1200px] px-6">
+        <div className="bg-white rounded-full shadow-sm border border-gray-100 flex items-center justify-between px-6 py-3">
+          {/* Left: Brand */}
           <div className="flex items-center gap-6">
-            <div className="hidden md:flex items-center gap-8">
-              <Link to="/" className="text-[20px] font-semibold"> Career Profile Builder </Link>
-            </div>
+            <Link to="/" className="text-[20px] font-bold text-[#0F172A] tracking-tight">
+              Career Profile Builder
+            </Link>
           </div>
 
-          {/* Right: Search + Buttons */}
+          {/* Right: Login Button */}
           <div className="flex items-center gap-4">
             <Link
-              to="/register"
-              className="h-10 px-5 inline-flex items-center justify-center rounded-full bg-[#4F46E5] text-white text-[14px] font-semibold hover:bg-[#4338CA] transition-colors"
-            >
-              Sign up
-            </Link>
-
-            <Link
               to="/login"
-              className="h-10 px-5 inline-flex items-center justify-center rounded-full border-2 border-[#4F46E5] text-[#4F46E5] text-[14px] font-semibold hover:bg-[#EEF2FF] transition-colors"
+              className="h-10 px-6 inline-flex items-center justify-center rounded-full bg-[#1A2E35] text-white text-[14px] font-semibold hover:bg-[#253e47] transition-all hover:shadow-lg hover:-translate-y-0.5"
             >
               Sign in
+            </Link>
+            <Link
+              to="/register"
+              className="h-10 px-6 inline-flex items-center justify-center rounded-full bg-[#1A2E35] text-white text-[14px] font-semibold hover:bg-[#334155] transition-all hover:-translate-y-0.5 shadow-md"
+            >
+              Sign up
             </Link>
           </div>
         </div>
