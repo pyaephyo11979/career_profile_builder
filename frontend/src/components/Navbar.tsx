@@ -16,13 +16,13 @@ export default function Navbar() {
           <div className="flex items-center gap-4">
             <Link
               to="/login"
-              className="h-10 px-6 inline-flex items-center justify-center rounded-full bg-[#1A2E35] text-white text-[14px] font-semibold hover:bg-[#253e47] transition-all hover:shadow-lg hover:-translate-y-0.5"
+              className="h-10 px-6 inline-flex items-center justify-center rounded-full bg-[#032b2b] text-white text-[14px] font-semibold hover:bg-[#043d3d] transition-all hover:shadow-lg hover:-translate-y-0.5"
             >
               Sign in
             </Link>
             <Link
               to="/register"
-              className="h-10 px-6 inline-flex items-center justify-center rounded-full bg-[#1A2E35] text-white text-[14px] font-semibold hover:bg-[#334155] transition-all hover:-translate-y-0.5 shadow-md"
+              className="h-10 px-6 inline-flex items-center justify-center rounded-full bg-[#032b2b] text-white text-[14px] font-semibold hover:bg-[#043d3d] transition-all hover:-translate-y-0.5 shadow-md"
             >
               Sign up
             </Link>
