@@ -105,8 +105,8 @@ export default function UploadPage() {
                     accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                     onChange={handleFileChange}
                     className="mt-4 block w-full cursor-pointer rounded-xl border border-slate-200 bg-white text-sm text-slate-700
-                               file:mr-4 file:rounded-lg file:border-0 file:bg-slate-900 file:px-4 file:py-2 file:text-sm file:font-medium file:text-white
-                               hover:file:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-400"
+                               file:mr-4 file:rounded-lg file:border-0 file:bg-[#032b2b] file:px-4 file:py-2 file:text-sm file:font-medium file:text-white
+                               hover:file:bg-[#043d3d] focus:outline-none focus:ring-2 focus:ring-slate-400"
                   />
                 </div>
               </label>
@@ -115,7 +115,7 @@ export default function UploadPage() {
               <div className="mt-5 grid gap-3 sm:grid-cols-2">
                 <button
                   type="button"
-                  className="inline-flex w-full items-center justify-center rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-slate-800"
+                  className="inline-flex w-full items-center justify-center rounded-xl bg-[#032b2b] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#043d3d]"
                 >
                   Upload & Parse
                 </button>
