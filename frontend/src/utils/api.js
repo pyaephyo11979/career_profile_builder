@@ -39,7 +39,7 @@ export async function loginAction({request}){
     }
     const data = await response.json();
     localStorage.setItem('token', data.access);
-    return redirect('/dashboard');
+    return redirect('/profile');
 }
 export async function logoutAction() {
     localStorage.removeItem('token');
