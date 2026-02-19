@@ -48,6 +48,7 @@ static/
 # Parser extracted artifacts
 backend/parser/data/output/
 backend/parser/services/__pycache__/
+backend/*.sqlite3
 
 # Logs and runtime files
 *.log
