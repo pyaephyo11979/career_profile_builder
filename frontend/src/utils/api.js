@@ -45,3 +45,21 @@ export async function logoutAction() {
     localStorage.removeItem('token');
     return redirect('/');
 }
+export async function ParseResumeAction({request}){
+    const formData = await request.formData();
+    const resume = formData.get('resume');
+    if (!resume) {
+        return json({error: 'Resume is required'}, {status: 400});
+    }
+    const response = await fetch(`${baseURL}/parse`, {
+        method: 'POST',
+        headers: {'Authorization': `Bearer ${localStorage.getItem('token')}`},
+        body: resume
+    });
+    if (!response.ok) {
+        const errorData = await response.json();
+        return json({error: errorData.error || 'Resume parsing failed'}, {status: response.status});
+    }
+    const data = await response.json();
+    return json(data);
+}
