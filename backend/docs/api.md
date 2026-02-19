@@ -166,6 +166,18 @@ Successful response (`201 Created`):
     "strengths": ["Email detected"],
     "warnings": ["Skills list is short"],
     "suggestions": ["Add more relevant skills (tools, frameworks, databases)."]
+  },
+  "profile_exports": {
+    "github_readme": "# Jane Doe\n\n## About Me\n...",
+    "linkedin_profile": {
+      "name": "Jane Doe",
+      "headline": "Software Engineer at ACME | Python | React | AWS",
+      "about": "I am a Software Engineer focused on building high-quality products...",
+      "experience": [],
+      "projects": [],
+      "education": [],
+      "skills": ["Python", "React", "AWS"]
+    }
   }
 }
 ```
@@ -284,6 +296,7 @@ All resume operations are scoped to the authenticated user; attempts to access r
 | `/api/resumes/` | GET | List the calling user's resumes ordered by `created_at` descending. | Yes |
 | `/api/resumes/<id>/` | GET | Retrieve one resume. | Yes |
 | `/api/resumes/<id>/edit/` | PATCH | Update editable fields (`parsed_data`, `resume_health`, `is_confirmed`). | Yes |
+| `/api/resumes/<id>/exports/` | GET | Generate GitHub README and LinkedIn-ready profile content from the parsed resume. | Yes |
 
 #### List (`GET /api/resumes/`)
 
@@ -297,6 +310,10 @@ Response (`200 OK`):
     "raw_text": "...",
     "parsed_data": {"contact": {"email": "jane@example.com"}},
     "resume_health": {"score": 70},
+    "profile_exports": {
+      "github_readme": "# Jane Doe\n...",
+      "linkedin_profile": {"headline": "Software Engineer | Python | React"}
+    },
     "is_confirmed": false,
     "created_at": "2026-01-31T10:04:27Z",
     "updated_at": "2026-01-31T10:04:27Z"
@@ -307,6 +324,28 @@ Response (`200 OK`):
 #### Detail (`GET /api/resumes/<id>/`)
 
 Returns the same shape as list entries. Missing records or attempts to fetch another user's resume yield `404`.
+
+#### Exports (`GET /api/resumes/<id>/exports/`)
+
+Response (`200 OK`):
+
+```json
+{
+  "resume_id": 12,
+  "profile_exports": {
+    "github_readme": "# Jane Doe\n...",
+    "linkedin_profile": {
+      "name": "Jane Doe",
+      "headline": "Software Engineer at ACME | Python | React | AWS",
+      "about": "I am a Software Engineer focused on building high-quality products...",
+      "experience": [],
+      "projects": [],
+      "education": [],
+      "skills": ["Python", "React", "AWS"]
+    }
+  }
+}
+```
 
 #### Update (`PATCH /api/resumes/<id>/edit/`)
 

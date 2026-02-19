@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from parser.models import Resume
+from parser.services.profile_export import ResumeProfileExporter
 
 class ResumeUploadSerializer(serializers.Serializer):
     file = serializers.FileField()
@@ -13,11 +14,17 @@ class ResumeUploadSerializer(serializers.Serializer):
         return value
     
 class ResumeCreateSerializer(serializers.ModelSerializer):
+    profile_exports = serializers.SerializerMethodField()
+
     class Meta:
         model = Resume
         fields = ["id", "file_name", "raw_text", "parsed_data", "resume_health",
-                  "is_confirmed", "created_at", "updated_at"]
+                  "is_confirmed", "created_at", "updated_at", "profile_exports"]
         read_only_fields = ["id", "created_at", "updated_at"]
+
+    def get_profile_exports(self, obj):
+        exporter = ResumeProfileExporter()
+        return exporter.export(obj.parsed_data)
 
 class ResumeUpdateSerializer(serializers.ModelSerializer):
     class Meta:
