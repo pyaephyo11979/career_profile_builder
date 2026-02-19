@@ -86,3 +86,4 @@ coverage/
 Thumbs.db
 .sass-cache/
 *.tgz
+*.sqlite3
