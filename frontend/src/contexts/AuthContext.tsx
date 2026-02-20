@@ -1,20 +1,5 @@
-import React, { createContext, useContext, useMemo, useState } from "react";
-
-type TokenPair = { access: string; refresh: string };
-
-function readTokens(): TokenPair | null {
-  const raw = localStorage.getItem("cpb_tokens");
-  if (!raw) return null;
-  try {
-    const parsed = JSON.parse(raw) as Partial<TokenPair>;
-    if (typeof parsed.access === "string" && typeof parsed.refresh === "string") {
-      return { access: parsed.access, refresh: parsed.refresh };
-    }
-    return null;
-  } catch {
-    return null;
-  }
-}
+import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { clearTokens, getTokens, isAccessTokenExpired, type TokenPair } from "../lib/api";
 
 type AuthContextValue = {
   isAuthenticated: boolean;
@@ -26,19 +11,52 @@ type AuthContextValue = {
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [tokens, setTokens] = useState<TokenPair | null>(() => readTokens());
+  const [tokens, setTokens] = useState<TokenPair | null>(() => {
+    const current = getTokens();
+    if (!current?.access) return null;
+    if (isAccessTokenExpired(current.access)) {
+      clearTokens();
+      return null;
+    }
+    return current;
+  });
 
   const value = useMemo<AuthContextValue>(() => {
     return {
-      isAuthenticated: !!tokens?.access,
+      isAuthenticated: !!tokens?.access && !isAccessTokenExpired(tokens.access),
       accessToken: tokens?.access ?? null,
-      syncFromStorage: () => setTokens(readTokens()),
+      syncFromStorage: () => {
+        const current = getTokens();
+        if (!current?.access || isAccessTokenExpired(current.access)) {
+          clearTokens();
+          setTokens(null);
+          return;
+        }
+        setTokens(current);
+      },
       logout: () => {
-        localStorage.removeItem("cpb_tokens");
+        clearTokens();
         setTokens(null);
       },
     };
   }, [tokens]);
+
+  useEffect(() => {
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key !== "cpb_tokens") return;
+      const current = getTokens();
+      if (!current?.access || isAccessTokenExpired(current.access)) {
+        setTokens(null);
+        return;
+      }
+      setTokens(current);
+    };
+
+    window.addEventListener("storage", handleStorage);
+    return () => {
+      window.removeEventListener("storage", handleStorage);
+    };
+  }, []);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

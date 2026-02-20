@@ -28,7 +28,7 @@ const Login = () => {
 
       auth.syncFromStorage();
 
-      navigate("/upload"); // now actually logged in
+      navigate("/profile");
     } catch (err) {
       const message = err instanceof Error ? err.message : "Login failed";
       setError(message);

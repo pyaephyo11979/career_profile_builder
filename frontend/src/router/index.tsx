@@ -5,6 +5,7 @@ import Register from "../pages/Register.tsx";
 import Layout from "../pages/layouts/Layout";
 import UploadPage from "../pages/UploadPage.tsx";
 import ResultPage from "../pages/ResultPage.tsx";
+import ProfilePage from "../pages/ProfilePage.tsx";
 import { RedirectIfAuthed, RequireAuth } from "./guards";
 
 const router = createBrowserRouter([
@@ -19,13 +20,17 @@ const router = createBrowserRouter([
       {
         path: "/login",
         element: (
+          <RedirectIfAuthed>
             <Login />
+          </RedirectIfAuthed>
         ),
       },
       {
         path: "/register",
         element: (
+          <RedirectIfAuthed>
             <Register />
+          </RedirectIfAuthed>
         ),
       },
       {
@@ -33,6 +38,14 @@ const router = createBrowserRouter([
         element: (
           <RequireAuth>
             <UploadPage />
+          </RequireAuth>
+        ),
+      },
+      {
+        path: "/profile",
+        element: (
+          <RequireAuth>
+            <ProfilePage />
           </RequireAuth>
         ),
       },

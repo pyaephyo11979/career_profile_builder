@@ -6,8 +6,14 @@ import {
 import router from './router';
 import { AuthProvider } from "./contexts/AuthContext";
 
-createRoot(document.getElementById('root')).render(
-    <AuthProvider>
-      <RouterProvider router={router} />
-    </AuthProvider>
-)
+const rootElement = document.getElementById("root");
+
+if (!rootElement) {
+  throw new Error("Root element with id 'root' was not found.");
+}
+
+createRoot(rootElement).render(
+  <AuthProvider>
+    <RouterProvider router={router} />
+  </AuthProvider>
+);

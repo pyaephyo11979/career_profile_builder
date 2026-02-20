@@ -1,41 +1,55 @@
 import { useEffect, useRef, useState } from "react";
 
-function useFetch(url,_options) {
-    let [data,setData] = useState(null);
-    let [ loading, setLoading ] = useState(false);
-    let [ error, setError ] = useState(null);
-    let options=useRef(_options).current;
+type UseFetchState<T> = {
+  data: T | null;
+  loading: boolean;
+  error: string | null;
+};
 
-    useEffect(() => {
-      console.log(options)
-      let abortController = new AbortController();
-      let signal = abortController.signal;
+function useFetch<T = unknown>(url: string, init?: RequestInit): UseFetchState<T> {
+  const [data, setData] = useState<T | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const options = useRef<RequestInit | undefined>(init).current;
 
-        setLoading(true);
-        fetch(url , {
-          signal
-        })
-        .then(res => {
-          if(!res.ok) {
-            throw Error('som ething went wrong');
-          }
-          return res.json();
-        })
-        .then(data => {
-          setData(data);
-          setError(null);
-          setLoading(false);
-        })
-        .catch(e => {
-          setError(e.message);
-        })
+  useEffect(() => {
+    const abortController = new AbortController();
 
-        //cleanup function
-        return () => {
-          abortController.abort();
+    async function run() {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const response = await fetch(url, {
+          ...options,
+          signal: abortController.signal,
+        });
+
+        if (!response.ok) {
+          throw new Error(`${response.status} ${response.statusText}`);
         }
-      },[url,options]);
-    return { data , loading , error };
+
+        const payload = (await response.json()) as T;
+        setData(payload);
+      } catch (err) {
+        if (abortController.signal.aborted) return;
+        const message = err instanceof Error ? err.message : "Request failed";
+        setError(message);
+      } finally {
+        if (!abortController.signal.aborted) {
+          setLoading(false);
+        }
+      }
+    }
+
+    run();
+
+    return () => {
+      abortController.abort();
+    };
+  }, [url, options]);
+
+  return { data, loading, error };
 }
 
 export default useFetch;

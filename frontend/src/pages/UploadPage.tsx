@@ -1,8 +1,30 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { type ChangeEvent, useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { uploadResume } from "../lib/api";
+
+const MAX_FILE_SIZE = 5 * 1024 * 1024;
+
+function hasValidExtension(fileName: string): boolean {
+  const lower = fileName.toLowerCase();
+  return lower.endsWith(".pdf") || lower.endsWith(".doc") || lower.endsWith(".docx");
+}
+
+function getValidationError(candidate: File | null): string | null {
+  if (!candidate) return "Please choose a resume file first.";
+  if (!hasValidExtension(candidate.name)) {
+    return "Unsupported file type. Please upload a PDF or Word document.";
+  }
+  if (candidate.size > MAX_FILE_SIZE) return "File size exceeds the 5 MB limit.";
+  return null;
+}
 
 export default function UploadPage() {
   const [file, setFile] = useState<File | null>(null);
-  const [preview, setPreview] = useState("");
+  const [preview, setPreview] = useState<string>("");
+  const [isUploading, setIsUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [status, setStatus] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const fileHint = useMemo(() => {
     if (!file) return "PDF or DOCX only. Max 5MB.";
@@ -10,29 +32,67 @@ export default function UploadPage() {
     return `${file.name} • ${sizeMb} MB`;
   }, [file]);
 
-  const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setError(null);
+    setStatus(null);
+    setFile(e.target.files?.[0] ?? null);
+  };
+
+  const handleClear = () => {
+    setFile(null);
+    setError(null);
+    setStatus(null);
+  };
+
+  const handleUpload = async () => {
+    const selectedFile = file;
+    const validationError = getValidationError(selectedFile);
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+    if (!selectedFile) {
+      setError("Please choose a resume file first.");
+      return;
+    }
+
+    setIsUploading(true);
+    setError(null);
+    setStatus("Uploading and parsing your resume...");
+
+    try {
+      const payload = await uploadResume(selectedFile);
+      setStatus("Resume parsed successfully. Opening results...");
+      navigate(`/resumes/${payload.resume_id}`);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Resume parsing failed.";
+      setError(message);
+      setStatus(null);
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   useEffect(() => {
-    if (file) {
-      handlePreviewFile(file);
-    }else{
+    if (!file) {
       setPreview("");
+      return;
     }
-  }, [file]);
 
-  let handlePreviewFile = (file) => {
-    let reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => {
-      setPreview(reader.result);
-    };
-  };
+    if (!file.name.toLowerCase().endsWith(".pdf")) {
+      setPreview("");
+      return;
+    }
+
+    const objectUrl = URL.createObjectURL(file);
+    setPreview(objectUrl);
+
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [file]);
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <div className="mx-auto max-w-5xl px-4 py-10">
+      <div className="mx-auto max-w-5xl px-4 py-6 sm:py-8 md:py-10">
         {/* Header */}
         <header className="mb-8">
           <h1 className="text-2xl font-semibold tracking-tight text-slate-900">
@@ -111,19 +171,34 @@ export default function UploadPage() {
                 </div>
               </label>
 
-              {/* Primary actions (UI only) */}
+              {(error || status) && (
+                <div
+                  className={`mt-5 rounded-lg border px-4 py-3 text-sm ${
+                    error
+                      ? "border-red-200 bg-red-50 text-red-700"
+                      : "border-emerald-200 bg-emerald-50 text-emerald-700"
+                  }`}
+                >
+                  {error ?? status}
+                </div>
+              )}
+
+              {/* Primary actions */}
               <div className="mt-5 grid gap-3 sm:grid-cols-2">
                 <button
                   type="button"
-                  className="inline-flex w-full items-center justify-center rounded-xl bg-[#032b2b] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#043d3d]"
+                  className="inline-flex w-full items-center justify-center rounded-xl bg-[#032b2b] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#043d3d] disabled:cursor-not-allowed disabled:opacity-60"
+                  onClick={handleUpload}
+                  disabled={isUploading || !file}
                 >
-                  Upload & Parse
+                  {isUploading ? "Parsing..." : "Upload & Parse"}
                 </button>
 
                 <button
                   type="button"
                   className="inline-flex w-full items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-900 hover:bg-slate-50"
-                  onClick={() => setFile(null)}
+                  onClick={handleClear}
+                  disabled={isUploading}
                 >
                   Clear
                 </button>
@@ -157,9 +232,9 @@ export default function UploadPage() {
               </div>
 
               {preview && (
-                <iframe
+                  <iframe
                   src={preview}
-                  className="mt-6 h-[600px] w-full rounded-xl border border-slate-200 bg-slate-50"
+                  className="mt-6 h-[420px] sm:h-[520px] md:h-[600px] w-full rounded-xl border border-slate-200 bg-slate-50"
                   title="Resume Preview"
                 >
                   This browser does not support PDFs. Please download the PDF to
@@ -219,6 +294,11 @@ export default function UploadPage() {
                       </span>
                     </div>
                   </div>
+                  {!preview && (
+                    <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-xs text-slate-600">
+                      Preview is available for PDF files only. DOC/DOCX uploads will still parse correctly.
+                    </div>
+                  )}
                 </div>
               )}
             </div>

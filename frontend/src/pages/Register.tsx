@@ -51,7 +51,7 @@ const Register = () => {
       await login({ username, password });
 
       auth.syncFromStorage();
-      navigate("/upload");
+      navigate("/profile");
     } catch (err) {
       const message = err instanceof Error ? err.message : "Registration failed";
       setError(message);
