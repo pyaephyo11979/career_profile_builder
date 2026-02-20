@@ -5,6 +5,7 @@ import Register from "../pages/Register.tsx";
 import Layout from "../pages/layouts/Layout";
 import UploadPage from "../pages/UploadPage.tsx";
 import ResultPage from "../pages/ResultPage.tsx";
+import { RedirectIfAuthed, RequireAuth } from "./guards";
 
 const router = createBrowserRouter([
   {
@@ -17,19 +18,31 @@ const router = createBrowserRouter([
       },
       {
         path: "/login",
-        element: <Login />,
+        element: (
+            <Login />
+        ),
       },
       {
         path: "/register",
-        element: <Register />,
+        element: (
+            <Register />
+        ),
       },
       {
         path: "/upload",
-        element: <UploadPage />,
+        element: (
+          <RequireAuth>
+            <UploadPage />
+          </RequireAuth>
+        ),
       },
       {
         path: "/resumes/:id",
-        element: <ResultPage />,
+        element: (
+          <RequireAuth>
+            <ResultPage />
+          </RequireAuth>
+        ),
       },
     ],
   },

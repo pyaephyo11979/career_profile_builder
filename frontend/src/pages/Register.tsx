@@ -1,24 +1,63 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { login, register } from "../lib/api";
+import { useAuth } from "../contexts/AuthContext";
+
+type FormState = {
+  username: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+};
 
 const Register = () => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormState>({
     username: "",
     email: "",
     password: "",
+    confirmPassword: "",
   });
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
   const navigate = useNavigate();
+  const auth = useAuth();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("Register Data:", formData);
-    // TODO: Call API /api/register/ here
-    alert("Registration implementation logic goes here");
-    navigate("/login");
+    setError(null);
+
+    const username = formData.username.trim();
+    const email = formData.email.trim();
+    const password = formData.password;
+
+    if (!username) return setError("Username is required.");
+    if (!email) return setError("Email is required.");
+    if (password.length < 8) return setError("Password must be at least 8 characters.");
+    if (password !== formData.confirmPassword) return setError("Passwords do not match.");
+
+    setIsSubmitting(true);
+    try {
+      // Register (includes email)
+      await register({ username, email, password });
+
+      // Auto-login
+      await login({ username, password });
+
+      auth.syncFromStorage();
+      navigate("/upload");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Registration failed";
+      setError(message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -28,11 +67,15 @@ const Register = () => {
           Create Account
         </h2>
 
+        {error && (
+          <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {error}
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Username
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Username</label>
             <input
               type="text"
               name="username"
@@ -41,13 +84,13 @@ const Register = () => {
               placeholder="Choose a username"
               value={formData.username}
               onChange={handleChange}
+              disabled={isSubmitting}
+              autoComplete="username"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Email
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
             <input
               type="email"
               name="email"
@@ -56,38 +99,55 @@ const Register = () => {
               placeholder="you@example.com"
               value={formData.email}
               onChange={handleChange}
+              disabled={isSubmitting}
+              autoComplete="email"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Password
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
             <input
               type="password"
               name="password"
               required
+              minLength={8}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
-              placeholder="Minimum 8 characters"
+              placeholder="Create a password (min 8 chars)"
               value={formData.password}
               onChange={handleChange}
+              disabled={isSubmitting}
+              autoComplete="new-password"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+            <input
+              type="password"
+              name="confirmPassword"
+              required
+              minLength={8}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+              placeholder="Re-enter password"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              disabled={isSubmitting}
+              autoComplete="new-password"
             />
           </div>
 
           <button
             type="submit"
-            className="w-full bg-[#032b2b] hover:bg-[#043d3d] text-white font-semibold py-2.5 rounded-lg transition duration-200"
+            className="w-full bg-[#032b2b] hover:bg-[#043d3d] text-white font-semibold py-2.5 rounded-lg transition duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
+            disabled={isSubmitting}
           >
-            Register
+            {isSubmitting ? "Creating account..." : "Create Account"}
           </button>
         </form>
 
         <p className="mt-4 text-center text-sm text-gray-600">
           Already have an account?{" "}
-          <Link
-            to="/login"
-            className="text-blue-600 hover:text-blue-800 font-medium"
-          >
+          <Link to="/login" className="text-blue-600 hover:text-blue-800 font-medium">
             Login
           </Link>
         </p>

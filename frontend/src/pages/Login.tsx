@@ -1,23 +1,40 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-// import "./App.css";
-
-// --- Components ---
+import { login } from "../lib/api";
+import { useAuth } from "../contexts/AuthContext";
 
 const Login = () => {
   const [formData, setFormData] = useState({ username: "", password: "" });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
   const navigate = useNavigate();
+  const auth = useAuth();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Login Data:", formData);
-    // TODO: Call API /api/auth/login/ here
-    alert("Login implementation logic goes here");
-    navigate("/"); // Redirect to home after login
+    setError(null);
+    setIsSubmitting(true);
+
+    try {
+      await login({
+        username: formData.username.trim(),
+        password: formData.password,
+      });
+
+      auth.syncFromStorage();
+
+      navigate("/upload"); // now actually logged in
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Login failed";
+      setError(message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -26,6 +43,12 @@ const Login = () => {
         <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">
           Login
         </h2>
+
+        {error && (
+          <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {error}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -40,6 +63,8 @@ const Login = () => {
               placeholder="Enter username"
               value={formData.username}
               onChange={handleChange}
+              disabled={isSubmitting}
+              autoComplete="username"
             />
           </div>
 
@@ -55,14 +80,17 @@ const Login = () => {
               placeholder="••••••••"
               value={formData.password}
               onChange={handleChange}
+              disabled={isSubmitting}
+              autoComplete="current-password"
             />
           </div>
 
           <button
             type="submit"
-            className="w-full bg-[#032b2b] hover:bg-[#043d3d] text-white font-semibold py-2.5 rounded-lg transition duration-200"
+            className="w-full bg-[#032b2b] hover:bg-[#043d3d] text-white font-semibold py-2.5 rounded-lg transition duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
+            disabled={isSubmitting}
           >
-            Sign In
+            {isSubmitting ? "Signing in..." : "Sign In"}
           </button>
         </form>
 
