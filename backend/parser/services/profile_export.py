@@ -10,9 +10,102 @@ class ResumeProfileExporter:
 
     def export(self, parsed_data: Dict[str, Any]) -> Dict[str, Any]:
         return {
+            "cv_markdown": self.build_cv_markdown(parsed_data),
             "github_readme": self.build_github_readme(parsed_data),
             "linkedin_profile": self.build_linkedin_profile(parsed_data),
         }
+
+    def build_cv_markdown(self, parsed_data: Dict[str, Any]) -> str:
+        contact = parsed_data.get("contact", {})
+        name = contact.get("name") or "Your Name"
+        email = contact.get("email")
+        phone = contact.get("phone")
+        links = contact.get("links") or {}
+        skills = parsed_data.get("skills", {}).get("categories", {})
+        experience = parsed_data.get("experience", [])
+        projects = parsed_data.get("projects", [])
+        education = parsed_data.get("education", [])
+
+        lines: List[str] = [f"# {name}", ""]
+
+        contact_parts: List[str] = []
+        if email:
+            contact_parts.append(str(email))
+        if phone:
+            contact_parts.append(str(phone))
+        if links.get("linkedin"):
+            contact_parts.append(f"LinkedIn: {links['linkedin']}")
+        if links.get("github"):
+            contact_parts.append(f"GitHub: {links['github']}")
+
+        other_links = links.get("other", [])
+        if isinstance(other_links, list):
+            for link in other_links:
+                if link:
+                    contact_parts.append(str(link))
+
+        if contact_parts:
+            lines.extend([" | ".join(contact_parts), ""])
+
+        if experience:
+            lines.append("## Experience")
+            for item in experience:
+                title = item.get("title") or "Role"
+                company = item.get("company") or "Company"
+                start = item.get("start_date") or ""
+                end = item.get("end_date") or "Present"
+                location = item.get("location") or ""
+
+                details = " • ".join([part for part in [f"{start} - {end}".strip(" -"), location] if part])
+                if details:
+                    lines.append(f"### {title}, {company} ({details})")
+                else:
+                    lines.append(f"### {title}, {company}")
+
+                for highlight in item.get("highlights", []):
+                    lines.append(f"- {highlight}")
+                lines.append("")
+
+        if projects:
+            lines.append("## Projects")
+            for item in projects:
+                project_name = item.get("name") or "Project"
+                summary = item.get("summary") or ""
+                lines.append(f"### {project_name}")
+                if summary:
+                    lines.append(summary)
+                for highlight in item.get("highlights", []):
+                    lines.append(f"- {highlight}")
+                project_links = item.get("links") or []
+                if project_links:
+                    lines.append(f"- Link: {project_links[0]}")
+                lines.append("")
+
+        if education:
+            lines.append("## Education")
+            for item in education:
+                school = item.get("school") or "Institution"
+                degree = item.get("degree") or "Degree"
+                field = item.get("field")
+                start_year = item.get("start_year") or ""
+                end_year = item.get("end_year") or ""
+
+                degree_line = degree
+                if field:
+                    degree_line = f"{degree} in {field}"
+
+                year_text = " - ".join([value for value in [start_year, end_year] if value])
+                if year_text:
+                    lines.append(f"- **{school}**: {degree_line} ({year_text})")
+                else:
+                    lines.append(f"- **{school}**: {degree_line}")
+            lines.append("")
+
+        flattened_skills = self._flatten_top_skills(skills, limit=50)
+        if flattened_skills:
+            lines.extend(["## Skills", ", ".join(flattened_skills), ""])
+
+        return "\n".join(lines).strip()
 
     def build_github_readme(self, parsed_data: Dict[str, Any]) -> str:
         contact = parsed_data.get("contact", {})

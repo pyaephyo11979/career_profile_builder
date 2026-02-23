@@ -4,9 +4,11 @@ import { useAuth } from "../contexts/AuthContext";
 import {
   getResumeById,
   getResumeExports,
+  updateResume,
   type ParsedEducation,
   type ParsedExperience,
   type ParsedProject,
+  type ParsedResumeData,
   type ResumeProfileExports,
   type ResumeRecord,
 } from "../lib/api";
@@ -15,6 +17,16 @@ function getScoreColor(score: number) {
   if (score >= 80) return "bg-emerald-500";
   if (score >= 60) return "bg-amber-500";
   return "bg-red-500";
+}
+
+function downloadTextFile(content: string, fileName: string, mimeType = "text/plain;charset=utf-8") {
+  const blob = new Blob([content], { type: mimeType });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = fileName;
+  anchor.click();
+  URL.revokeObjectURL(url);
 }
 
 export default function ResultPage() {
@@ -29,6 +41,11 @@ export default function ResultPage() {
   const [exportError, setExportError] = useState<string | null>(null);
   const [isExporting, setIsExporting] = useState(false);
   const [copyStatus, setCopyStatus] = useState<string | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [editError, setEditError] = useState<string | null>(null);
+  const [editStatus, setEditStatus] = useState<string | null>(null);
+  const [parsedJsonDraft, setParsedJsonDraft] = useState("");
 
   const resumeId = useMemo(() => {
     if (!id) return null;
@@ -54,6 +71,7 @@ export default function ResultPage() {
         if (!cancelled) {
           setResume(data);
           setExports((data.profile_exports as ResumeProfileExports | undefined) ?? null);
+          setParsedJsonDraft(JSON.stringify(data.parsed_data ?? {}, null, 2));
         }
       } catch (err) {
         const message = err instanceof Error ? err.message : "Failed to load resume.";
@@ -93,6 +111,7 @@ export default function ResultPage() {
   const education = parsedData.education ?? [];
   const skillsByCategory = parsedData.skills?.categories ?? {};
   const score = resume.resume_health?.score ?? 0;
+  const cvMarkdown = exports?.cv_markdown ?? "";
   const githubReadme = exports?.github_readme ?? "";
   const linkedinProfile = exports?.linkedin_profile;
 
@@ -114,6 +133,50 @@ export default function ResultPage() {
     }
   };
 
+  const handleStartEdit = () => {
+    setParsedJsonDraft(JSON.stringify(parsedData, null, 2));
+    setEditError(null);
+    setEditStatus(null);
+    setIsEditing(true);
+  };
+
+  const handleCancelEdit = () => {
+    setParsedJsonDraft(JSON.stringify(parsedData, null, 2));
+    setEditError(null);
+    setEditStatus(null);
+    setIsEditing(false);
+  };
+
+  const handleSaveEdits = async () => {
+    if (!resumeId) return;
+
+    let parsedDraft: ParsedResumeData;
+    try {
+      parsedDraft = JSON.parse(parsedJsonDraft) as ParsedResumeData;
+    } catch {
+      setEditError("Invalid JSON format. Please fix parsing errors before saving.");
+      return;
+    }
+
+    setIsSaving(true);
+    setEditError(null);
+    setEditStatus(null);
+
+    try {
+      const updatedResume = await updateResume(resumeId, { parsed_data: parsedDraft });
+      setResume(updatedResume);
+      const payload = await getResumeExports(resumeId);
+      setExports(payload.profile_exports);
+      setEditStatus("Resume information updated and CV exports regenerated.");
+      setIsEditing(false);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to save resume updates.";
+      setEditError(message);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const handleCopy = async (value: string, label: string) => {
     try {
       await navigator.clipboard.writeText(value);
@@ -125,13 +188,21 @@ export default function ResultPage() {
 
   const handleDownloadReadme = () => {
     if (!githubReadme) return;
-    const blob = new Blob([githubReadme], { type: "text/markdown;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const anchor = document.createElement("a");
-    anchor.href = url;
-    anchor.download = "README.md";
-    anchor.click();
-    URL.revokeObjectURL(url);
+    downloadTextFile(githubReadme, "README.md", "text/markdown;charset=utf-8");
+  };
+
+  const handleDownloadCv = () => {
+    if (!cvMarkdown) return;
+    downloadTextFile(cvMarkdown, "CV.md", "text/markdown;charset=utf-8");
+  };
+
+  const handleDownloadLinkedinJson = () => {
+    if (!linkedinProfile) return;
+    downloadTextFile(
+      JSON.stringify(linkedinProfile, null, 2),
+      "linkedin_profile.json",
+      "application/json;charset=utf-8"
+    );
   };
 
   return (
@@ -158,6 +229,71 @@ export default function ResultPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-[1fr_340px]">
           <div className="p-5 sm:p-6 md:p-8">
+            <div className="mb-10 rounded-lg border border-gray-200 bg-white">
+              <div className="flex flex-col gap-3 border-b border-gray-200 p-4 sm:flex-row sm:items-center sm:justify-between">
+                <h3 className="text-base font-semibold text-gray-900">Edit Current Information</h3>
+                {!isEditing ? (
+                  <button
+                    type="button"
+                    onClick={handleStartEdit}
+                    className="inline-flex h-10 items-center justify-center rounded-lg bg-[#032b2b] px-4 text-sm font-semibold text-white hover:bg-[#043d3d]"
+                  >
+                    Edit Details
+                  </button>
+                ) : (
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={handleSaveEdits}
+                      disabled={isSaving}
+                      className="inline-flex h-10 items-center justify-center rounded-lg bg-[#032b2b] px-4 text-sm font-semibold text-white hover:bg-[#043d3d] disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      {isSaving ? "Saving..." : "Save & Regenerate"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleCancelEdit}
+                      disabled={isSaving}
+                      className="inline-flex h-10 items-center justify-center rounded-lg border border-gray-300 bg-white px-4 text-sm font-semibold text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {(editError || editStatus) && (
+                <div
+                  className={`mx-4 mt-4 rounded-lg border px-3 py-2 text-sm ${
+                    editError
+                      ? "border-red-200 bg-red-50 text-red-700"
+                      : "border-emerald-200 bg-emerald-50 text-emerald-700"
+                  }`}
+                >
+                  {editError ?? editStatus}
+                </div>
+              )}
+
+              <div className="p-4">
+                {!isEditing ? (
+                  <p className="text-sm text-gray-600">
+                    Update your extracted details, save them, and regenerate a fresh CV export from the edited data.
+                  </p>
+                ) : (
+                  <div className="space-y-2">
+                    <p className="text-xs text-gray-500">
+                      Edit JSON below (`parsed_data`) and save. Resume score and exports will be regenerated.
+                    </p>
+                    <textarea
+                      value={parsedJsonDraft}
+                      onChange={(event) => setParsedJsonDraft(event.target.value)}
+                      className="h-80 w-full rounded-lg border border-gray-300 p-3 font-mono text-xs text-gray-800 focus:border-[#032b2b] focus:outline-none focus:ring-1 focus:ring-[#032b2b]"
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
+
             {experience.length > 0 && (
               <div className="mb-10">
                 <div className="mb-4 border-b-2 border-gray-200 pb-2 text-lg font-bold uppercase tracking-wide text-gray-700">
@@ -280,6 +416,33 @@ export default function ResultPage() {
               <div className="space-y-4 p-4">
                 <div className="rounded-lg border border-gray-200">
                   <div className="flex flex-col gap-2 border-b border-gray-200 p-3 sm:flex-row sm:items-center sm:justify-between">
+                    <p className="text-sm font-semibold text-gray-800">Generated CV (Markdown)</p>
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleCopy(cvMarkdown, "CV")}
+                        disabled={!cvMarkdown}
+                        className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        Copy
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleDownloadCv}
+                        disabled={!cvMarkdown}
+                        className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        Download
+                      </button>
+                    </div>
+                  </div>
+                  <pre className="max-h-72 overflow-auto whitespace-pre-wrap p-3 text-xs text-gray-700">
+                    {cvMarkdown || "No CV export yet. Click \"Generate Exports\"."}
+                  </pre>
+                </div>
+
+                <div className="rounded-lg border border-gray-200">
+                  <div className="flex flex-col gap-2 border-b border-gray-200 p-3 sm:flex-row sm:items-center sm:justify-between">
                     <p className="text-sm font-semibold text-gray-800">GitHub README Export</p>
                     <div className="flex gap-2">
                       <button
@@ -308,19 +471,29 @@ export default function ResultPage() {
                 <div className="rounded-lg border border-gray-200">
                   <div className="flex flex-col gap-2 border-b border-gray-200 p-3 sm:flex-row sm:items-center sm:justify-between">
                     <p className="text-sm font-semibold text-gray-800">LinkedIn Profile Export</p>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        handleCopy(
-                          JSON.stringify(linkedinProfile ?? {}, null, 2),
-                          "LinkedIn profile JSON"
-                        )
-                      }
-                      disabled={!linkedinProfile}
-                      className="w-fit rounded-md border border-gray-300 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
-                    >
-                      Copy JSON
-                    </button>
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          handleCopy(
+                            JSON.stringify(linkedinProfile ?? {}, null, 2),
+                            "LinkedIn profile JSON"
+                          )
+                        }
+                        disabled={!linkedinProfile}
+                        className="w-fit rounded-md border border-gray-300 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        Copy JSON
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleDownloadLinkedinJson}
+                        disabled={!linkedinProfile}
+                        className="w-fit rounded-md border border-gray-300 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        Download JSON
+                      </button>
+                    </div>
                   </div>
                   <pre className="max-h-72 overflow-auto whitespace-pre-wrap p-3 text-xs text-gray-700">
                     {linkedinProfile

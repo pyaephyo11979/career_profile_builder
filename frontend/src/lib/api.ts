@@ -102,6 +102,7 @@ export type LinkedinProfileExport = {
 };
 
 export type ResumeProfileExports = {
+  cv_markdown?: string;
   github_readme?: string;
   linkedin_profile?: LinkedinProfileExport;
 };
@@ -334,4 +335,24 @@ export async function getResumes(): Promise<ResumeRecord[]> {
 
 export async function getResumeExports(id: string | number): Promise<ResumeExportsResponse> {
   return apiRequest<ResumeExportsResponse>(`/api/resumes/${id}/exports/`, { method: "GET" }, true);
+}
+
+export type ResumeUpdatePayload = {
+  parsed_data?: ParsedResumeData;
+  resume_health?: ResumeHealth;
+  is_confirmed?: boolean;
+};
+
+export async function updateResume(
+  id: string | number,
+  payload: ResumeUpdatePayload
+): Promise<ResumeRecord> {
+  return apiRequest<ResumeRecord>(
+    `/api/resumes/${id}/edit/`,
+    {
+      method: "PATCH",
+      body: JSON.stringify(payload),
+    },
+    true
+  );
 }
