@@ -730,19 +730,26 @@ export default function ResultPage() {
                 {experience.map((exp: ParsedExperience, index) => (
                   <div
                     key={`${exp.company ?? "company"}-${index}`}
-                    className="relative mb-6 border-l-4 border-gray-200 pl-4"
+                    className="mb-4 rounded-lg border border-gray-200 bg-gray-50 p-4"
                   >
-                    <h4 className="mb-1 text-lg font-semibold text-gray-900">{exp.title}</h4>
-                    <div className="mb-2 text-sm text-gray-500">
-                      {exp.company} • {exp.start_date || "N/A"} - {exp.end_date || "Present"} •{" "}
-                      {exp.location || "Remote"}
+                    <div className="flex flex-wrap items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <h4 className="break-words text-base font-semibold text-gray-900">
+                          {exp.title || "(Untitled role)"}
+                        </h4>
+                        <div className="mt-1 text-sm text-gray-600">
+                          <span className="font-medium text-gray-800">{exp.company || "(Company)"}</span>
+                          {exp.location ? <span className="text-gray-500"> • {exp.location}</span> : null}
+                        </div>
+                      </div>
+                      <div className="shrink-0 text-xs font-medium text-gray-500">
+                        {(exp.start_date || "N/A") + " - " + (exp.end_date || "Present")}
+                      </div>
                     </div>
                     {exp.highlights && exp.highlights.length > 0 && (
-                      <ul className="mt-2 pl-2 text-sm leading-relaxed text-gray-600">
+                      <ul className="mt-3 list-disc space-y-1 pl-5 text-sm leading-relaxed text-gray-700">
                         {exp.highlights.map((highlight, i) => (
-                          <li key={`${highlight}-${i}`} className="mb-1">
-                            • {highlight}
-                          </li>
+                          <li key={`${highlight}-${i}`}>{highlight}</li>
                         ))}
                       </ul>
                     )}
