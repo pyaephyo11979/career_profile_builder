@@ -91,20 +91,9 @@ export type ResumeRecord = {
   profile_exports?: JsonObject;
 };
 
-export type LinkedinProfileExport = {
-  name?: string;
-  headline?: string;
-  about?: string;
-  experience?: unknown[];
-  projects?: unknown[];
-  education?: unknown[];
-  skills?: string[];
-};
-
 export type ResumeProfileExports = {
   cv_markdown?: string;
   github_readme?: string;
-  linkedin_profile?: LinkedinProfileExport;
 };
 
 export type ResumeExportsResponse = {

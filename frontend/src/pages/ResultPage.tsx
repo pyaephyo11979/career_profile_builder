@@ -19,14 +19,142 @@ function getScoreColor(score: number) {
   return "bg-red-500";
 }
 
-function downloadTextFile(content: string, fileName: string, mimeType = "text/plain;charset=utf-8") {
-  const blob = new Blob([content], { type: mimeType });
+function downloadFile(blob: Blob, fileName: string) {
   const url = URL.createObjectURL(blob);
   const anchor = document.createElement("a");
   anchor.href = url;
   anchor.download = fileName;
   anchor.click();
   URL.revokeObjectURL(url);
+}
+
+function downloadTextFile(content: string, fileName: string, mimeType = "text/plain;charset=utf-8") {
+  downloadFile(new Blob([content], { type: mimeType }), fileName);
+}
+
+function normalizeUrl(url: string): string {
+  const trimmed = (url ?? "").trim();
+  if (!trimmed) return "";
+  if (/^(https?:\/\/|mailto:|tel:)/i.test(trimmed)) return trimmed;
+  return `https://${trimmed}`;
+}
+
+function toLines(text: string): string[] {
+  return text
+    .split("\n")
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function toLineText(items: string[] | undefined): string {
+  if (!items || items.length === 0) return "";
+  return items.join("\n");
+}
+
+function toCsvText(items: string[] | undefined): string {
+  if (!items || items.length === 0) return "";
+  return items.join(", ");
+}
+
+function fromCsvText(value: string): string[] {
+  return value
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function cloneParsedData(data: ParsedResumeData): ParsedResumeData {
+  return JSON.parse(JSON.stringify(data ?? {})) as ParsedResumeData;
+}
+
+function setPdfLine(line: string): string {
+  const escaped = line.replace(/\\/g, "\\\\").replace(/\(/g, "\\(").replace(/\)/g, "\\)");
+  return `(${escaped}) Tj`;
+}
+
+function buildPdfFromText(text: string): Blob {
+  const pageWidth = 612;
+  const pageHeight = 792;
+  const margin = 50;
+  const fontSize = 10;
+  const lineHeight = 14;
+  const maxLinesPerPage = Math.max(1, Math.floor((pageHeight - margin * 2) / lineHeight));
+  const allLines = text.replace(/\r/g, "").split("\n");
+  const pages: string[][] = [];
+
+  for (let i = 0; i < allLines.length; i += maxLinesPerPage) {
+    pages.push(allLines.slice(i, i + maxLinesPerPage));
+  }
+  if (pages.length === 0) pages.push([""]);
+
+  type PdfObj = { id: number; body: string };
+  const objects: PdfObj[] = [];
+  let idCounter = 1;
+
+  const catalogId = idCounter++;
+  const pagesId = idCounter++;
+  const pageIds: number[] = [];
+  const contentIds: number[] = [];
+
+  pages.forEach(() => {
+    const contentId = idCounter++;
+    const pageId = idCounter++;
+    contentIds.push(contentId);
+    pageIds.push(pageId);
+  });
+
+  const fontId = idCounter++;
+
+  objects.push({ id: catalogId, body: `<< /Type /Catalog /Pages ${pagesId} 0 R >>` });
+  objects.push({ id: pagesId, body: `<< /Type /Pages /Kids [${pageIds.map((id) => `${id} 0 R`).join(" ")}] /Count ${pageIds.length} >>` });
+
+  pages.forEach((lines, index) => {
+    const textOps: string[] = [];
+    textOps.push("BT");
+    textOps.push(`/F1 ${fontSize} Tf`);
+    textOps.push(`${lineHeight} TL`);
+    textOps.push(`${margin} ${pageHeight - margin} Td`);
+
+    lines.forEach((line, lineIndex) => {
+      if (lineIndex > 0) textOps.push("T*");
+      if (line.length > 0) textOps.push(setPdfLine(line));
+    });
+
+    textOps.push("ET");
+    const stream = textOps.join("\n");
+
+    objects.push({
+      id: contentIds[index],
+      body: `<< /Length ${stream.length} >>\nstream\n${stream}\nendstream`,
+    });
+
+    objects.push({
+      id: pageIds[index],
+      body: `<< /Type /Page /Parent ${pagesId} 0 R /MediaBox [0 0 ${pageWidth} ${pageHeight}] /Resources << /Font << /F1 ${fontId} 0 R >> >> /Contents ${contentIds[index]} 0 R >>`,
+    });
+  });
+
+  objects.push({ id: fontId, body: "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>" });
+  objects.sort((a, b) => a.id - b.id);
+
+  let pdf = "%PDF-1.4\n";
+  const offsets: number[] = [0];
+
+  objects.forEach((obj) => {
+    offsets.push(pdf.length);
+    pdf += `${obj.id} 0 obj\n${obj.body}\nendobj\n`;
+  });
+
+  const xrefOffset = pdf.length;
+  pdf += `xref\n0 ${objects.length + 1}\n`;
+  pdf += "0000000000 65535 f \n";
+
+  for (let i = 1; i < offsets.length; i += 1) {
+    pdf += `${offsets[i].toString().padStart(10, "0")} 00000 n \n`;
+  }
+
+  pdf += `trailer\n<< /Size ${objects.length + 1} /Root ${catalogId} 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`;
+  return new Blob([pdf], { type: "application/pdf" });
 }
 
 export default function ResultPage() {
@@ -45,7 +173,7 @@ export default function ResultPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [editError, setEditError] = useState<string | null>(null);
   const [editStatus, setEditStatus] = useState<string | null>(null);
-  const [parsedJsonDraft, setParsedJsonDraft] = useState("");
+  const [editDraft, setEditDraft] = useState<ParsedResumeData>({});
 
   const resumeId = useMemo(() => {
     if (!id) return null;
@@ -71,7 +199,7 @@ export default function ResultPage() {
         if (!cancelled) {
           setResume(data);
           setExports((data.profile_exports as ResumeProfileExports | undefined) ?? null);
-          setParsedJsonDraft(JSON.stringify(data.parsed_data ?? {}, null, 2));
+          setEditDraft(cloneParsedData(data.parsed_data ?? {}));
         }
       } catch (err) {
         const message = err instanceof Error ? err.message : "Failed to load resume.";
@@ -105,15 +233,17 @@ export default function ResultPage() {
   }
 
   const parsedData = resume.parsed_data ?? {};
-  const contact = parsedData.contact ?? {};
-  const experience = parsedData.experience ?? [];
-  const projects = parsedData.projects ?? [];
-  const education = parsedData.education ?? [];
-  const skillsByCategory = parsedData.skills?.categories ?? {};
+  const renderData = isEditing ? editDraft : parsedData;
+  const contact = renderData.contact ?? {};
+  const experience = renderData.experience ?? [];
+  const projects = renderData.projects ?? [];
+  const education = renderData.education ?? [];
+  const skillsByCategory = renderData.skills?.categories ?? {};
   const score = resume.resume_health?.score ?? 0;
   const cvMarkdown = exports?.cv_markdown ?? "";
   const githubReadme = exports?.github_readme ?? "";
-  const linkedinProfile = exports?.linkedin_profile;
+
+  const contactLinks = (contact.links ?? {}) as Record<string, string | string[] | null>;
 
   const handleGenerateExports = async () => {
     if (!resumeId) return;
@@ -134,14 +264,14 @@ export default function ResultPage() {
   };
 
   const handleStartEdit = () => {
-    setParsedJsonDraft(JSON.stringify(parsedData, null, 2));
+    setEditDraft(cloneParsedData(parsedData));
     setEditError(null);
     setEditStatus(null);
     setIsEditing(true);
   };
 
   const handleCancelEdit = () => {
-    setParsedJsonDraft(JSON.stringify(parsedData, null, 2));
+    setEditDraft(cloneParsedData(parsedData));
     setEditError(null);
     setEditStatus(null);
     setIsEditing(false);
@@ -150,20 +280,12 @@ export default function ResultPage() {
   const handleSaveEdits = async () => {
     if (!resumeId) return;
 
-    let parsedDraft: ParsedResumeData;
-    try {
-      parsedDraft = JSON.parse(parsedJsonDraft) as ParsedResumeData;
-    } catch {
-      setEditError("Invalid JSON format. Please fix parsing errors before saving.");
-      return;
-    }
-
     setIsSaving(true);
     setEditError(null);
     setEditStatus(null);
 
     try {
-      const updatedResume = await updateResume(resumeId, { parsed_data: parsedDraft });
+      const updatedResume = await updateResume(resumeId, { parsed_data: editDraft });
       setResume(updatedResume);
       const payload = await getResumeExports(resumeId);
       setExports(payload.profile_exports);
@@ -191,18 +313,125 @@ export default function ResultPage() {
     downloadTextFile(githubReadme, "README.md", "text/markdown;charset=utf-8");
   };
 
-  const handleDownloadCv = () => {
+  const handleDownloadCvPdf = () => {
     if (!cvMarkdown) return;
-    downloadTextFile(cvMarkdown, "CV.md", "text/markdown;charset=utf-8");
+    downloadFile(buildPdfFromText(cvMarkdown), "CV.pdf");
   };
 
-  const handleDownloadLinkedinJson = () => {
-    if (!linkedinProfile) return;
-    downloadTextFile(
-      JSON.stringify(linkedinProfile, null, 2),
-      "linkedin_profile.json",
-      "application/json;charset=utf-8"
-    );
+  const updateContactField = (field: "name" | "email" | "phone", value: string) => {
+    setEditDraft((prev) => ({
+      ...prev,
+      contact: {
+        ...(prev.contact ?? {}),
+        [field]: value,
+      },
+    }));
+  };
+
+  const updateContactLinks = (key: string, value: string | string[]) => {
+    setEditDraft((prev) => ({
+      ...prev,
+      contact: {
+        ...(prev.contact ?? {}),
+        links: {
+          ...((prev.contact?.links ?? {}) as Record<string, string | string[] | null>),
+          [key]: value,
+        },
+      },
+    }));
+  };
+
+  const updateExperience = (index: number, field: keyof ParsedExperience, value: string | string[]) => {
+    setEditDraft((prev) => {
+      const nextExperience = [...(prev.experience ?? [])];
+      nextExperience[index] = {
+        ...(nextExperience[index] ?? {}),
+        [field]: value,
+      };
+      return {
+        ...prev,
+        experience: nextExperience,
+      };
+    });
+  };
+
+  const addExperience = () => {
+    setEditDraft((prev) => ({
+      ...prev,
+      experience: [
+        ...(prev.experience ?? []),
+        { title: "", company: "", start_date: "", end_date: "", location: "", highlights: [] },
+      ],
+    }));
+  };
+
+  const removeExperience = (index: number) => {
+    setEditDraft((prev) => ({
+      ...prev,
+      experience: (prev.experience ?? []).filter((_, i) => i !== index),
+    }));
+  };
+
+  const updateProject = (index: number, field: keyof ParsedProject, value: string | string[]) => {
+    setEditDraft((prev) => {
+      const nextProjects = [...(prev.projects ?? [])];
+      nextProjects[index] = {
+        ...(nextProjects[index] ?? {}),
+        [field]: value,
+      };
+      return {
+        ...prev,
+        projects: nextProjects,
+      };
+    });
+  };
+
+  const addProject = () => {
+    setEditDraft((prev) => ({
+      ...prev,
+      projects: [
+        ...(prev.projects ?? []),
+        { name: "", summary: "", highlights: [], tech_stack: [], links: [] },
+      ],
+    }));
+  };
+
+  const removeProject = (index: number) => {
+    setEditDraft((prev) => ({
+      ...prev,
+      projects: (prev.projects ?? []).filter((_, i) => i !== index),
+    }));
+  };
+
+  const updateEducation = (index: number, field: keyof ParsedEducation, value: string) => {
+    setEditDraft((prev) => {
+      const nextEducation = [...(prev.education ?? [])];
+      nextEducation[index] = {
+        ...(nextEducation[index] ?? {}),
+        [field]: value,
+      };
+      return {
+        ...prev,
+        education: nextEducation,
+      };
+    });
+  };
+
+  const addEducation = () => {
+    setEditDraft((prev) => ({
+      ...prev,
+      education: [
+        ...(prev.education ?? []),
+        { school: "", degree: "", field: "", start_year: "", end_year: "" },
+      ],
+    }));
+  };
+
+  const removeEducation = (index: number) => {
+    setEditDraft((prev) => ({
+      ...prev,
+      education: (prev.education ?? []).filter((_, i) => i !== index),
+    }));
   };
 
   return (
@@ -210,9 +439,7 @@ export default function ResultPage() {
       <div className="mx-auto max-w-6xl overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
         <div className="flex flex-col gap-4 border-b border-gray-200 bg-white p-5 sm:flex-row sm:items-start sm:justify-between sm:p-6 md:p-8">
           <div>
-            <h2 className="m-0 text-2xl font-bold text-gray-900">
-              {contact.name || resume.file_name}
-            </h2>
+            <h2 className="m-0 text-2xl font-bold text-gray-900">{contact.name || resume.file_name}</h2>
             <div className="mt-2 text-sm text-gray-500">
               ID: #{resume.id} • Uploaded:{" "}
               {resume.created_at ? new Date(resume.created_at).toLocaleDateString() : "N/A"}
@@ -277,18 +504,219 @@ export default function ResultPage() {
               <div className="p-4">
                 {!isEditing ? (
                   <p className="text-sm text-gray-600">
-                    Update your extracted details, save them, and regenerate a fresh CV export from the edited data.
+                    Edit your extracted details directly in the web form, then save to regenerate updated exports.
                   </p>
                 ) : (
-                  <div className="space-y-2">
-                    <p className="text-xs text-gray-500">
-                      Edit JSON below (`parsed_data`) and save. Resume score and exports will be regenerated.
-                    </p>
-                    <textarea
-                      value={parsedJsonDraft}
-                      onChange={(event) => setParsedJsonDraft(event.target.value)}
-                      className="h-80 w-full rounded-lg border border-gray-300 p-3 font-mono text-xs text-gray-800 focus:border-[#032b2b] focus:outline-none focus:ring-1 focus:ring-[#032b2b]"
-                    />
+                  <div className="space-y-6">
+                    <div>
+                      <h4 className="mb-3 text-sm font-semibold text-gray-800">Contact</h4>
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        <input
+                          value={contact.name ?? ""}
+                          onChange={(event) => updateContactField("name", event.target.value)}
+                          placeholder="Full name"
+                          className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                        />
+                        <input
+                          value={contact.email ?? ""}
+                          onChange={(event) => updateContactField("email", event.target.value)}
+                          placeholder="Email"
+                          className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                        />
+                        <input
+                          value={contact.phone ?? ""}
+                          onChange={(event) => updateContactField("phone", event.target.value)}
+                          placeholder="Phone"
+                          className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                        />
+                        <input
+                          value={typeof contactLinks.github === "string" ? contactLinks.github : ""}
+                          onChange={(event) => updateContactLinks("github", event.target.value)}
+                          placeholder="GitHub URL"
+                          className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                        />
+                        <input
+                          value={typeof contactLinks.linkedin === "string" ? contactLinks.linkedin : ""}
+                          onChange={(event) => updateContactLinks("linkedin", event.target.value)}
+                          placeholder="LinkedIn URL"
+                          className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                        />
+                        <textarea
+                          value={toLineText(Array.isArray(contactLinks.other) ? contactLinks.other : [])}
+                          onChange={(event) => updateContactLinks("other", toLines(event.target.value))}
+                          placeholder="Other links (one per line)"
+                          className="h-24 rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="mb-3 flex items-center justify-between">
+                        <h4 className="text-sm font-semibold text-gray-800">Experience</h4>
+                        <button type="button" onClick={addExperience} className="text-xs font-semibold text-[#032b2b]">
+                          + Add Experience
+                        </button>
+                      </div>
+                      <div className="space-y-4">
+                        {experience.map((exp, index) => (
+                          <div key={`exp-${index}`} className="rounded-lg border border-gray-200 p-3">
+                            <div className="mb-3 grid gap-2 sm:grid-cols-2">
+                              <input
+                                value={exp.title ?? ""}
+                                onChange={(event) => updateExperience(index, "title", event.target.value)}
+                                placeholder="Title"
+                                className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                              />
+                              <input
+                                value={exp.company ?? ""}
+                                onChange={(event) => updateExperience(index, "company", event.target.value)}
+                                placeholder="Company"
+                                className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                              />
+                              <input
+                                value={exp.start_date ?? ""}
+                                onChange={(event) => updateExperience(index, "start_date", event.target.value)}
+                                placeholder="Start date"
+                                className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                              />
+                              <input
+                                value={exp.end_date ?? ""}
+                                onChange={(event) => updateExperience(index, "end_date", event.target.value)}
+                                placeholder="End date"
+                                className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                              />
+                              <input
+                                value={exp.location ?? ""}
+                                onChange={(event) => updateExperience(index, "location", event.target.value)}
+                                placeholder="Location"
+                                className="rounded-lg border border-gray-300 px-3 py-2 text-sm sm:col-span-2"
+                              />
+                            </div>
+                            <textarea
+                              value={toLineText(exp.highlights)}
+                              onChange={(event) => updateExperience(index, "highlights", toLines(event.target.value))}
+                              placeholder="Highlights (one per line)"
+                              className="h-20 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => removeExperience(index)}
+                              className="mt-2 text-xs font-semibold text-red-600"
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="mb-3 flex items-center justify-between">
+                        <h4 className="text-sm font-semibold text-gray-800">Projects</h4>
+                        <button type="button" onClick={addProject} className="text-xs font-semibold text-[#032b2b]">
+                          + Add Project
+                        </button>
+                      </div>
+                      <div className="space-y-4">
+                        {projects.map((project, index) => (
+                          <div key={`project-${index}`} className="rounded-lg border border-gray-200 p-3">
+                            <div className="grid gap-2 sm:grid-cols-2">
+                              <input
+                                value={project.name ?? ""}
+                                onChange={(event) => updateProject(index, "name", event.target.value)}
+                                placeholder="Project name"
+                                className="rounded-lg border border-gray-300 px-3 py-2 text-sm sm:col-span-2"
+                              />
+                              <textarea
+                                value={project.summary ?? ""}
+                                onChange={(event) => updateProject(index, "summary", event.target.value)}
+                                placeholder="Summary"
+                                className="h-20 rounded-lg border border-gray-300 px-3 py-2 text-sm sm:col-span-2"
+                              />
+                              <textarea
+                                value={toLineText(project.highlights)}
+                                onChange={(event) => updateProject(index, "highlights", toLines(event.target.value))}
+                                placeholder="Highlights (one per line)"
+                                className="h-20 rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                              />
+                              <textarea
+                                value={toLineText(project.links)}
+                                onChange={(event) => updateProject(index, "links", toLines(event.target.value))}
+                                placeholder="Links (one per line)"
+                                className="h-20 rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                              />
+                              <input
+                                value={toCsvText(project.tech_stack)}
+                                onChange={(event) => updateProject(index, "tech_stack", fromCsvText(event.target.value))}
+                                placeholder="Tech stack (comma separated)"
+                                className="rounded-lg border border-gray-300 px-3 py-2 text-sm sm:col-span-2"
+                              />
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => removeProject(index)}
+                              className="mt-2 text-xs font-semibold text-red-600"
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="mb-3 flex items-center justify-between">
+                        <h4 className="text-sm font-semibold text-gray-800">Education</h4>
+                        <button type="button" onClick={addEducation} className="text-xs font-semibold text-[#032b2b]">
+                          + Add Education
+                        </button>
+                      </div>
+                      <div className="space-y-3">
+                        {education.map((edu, index) => (
+                          <div key={`edu-${index}`} className="rounded-lg border border-gray-200 p-3">
+                            <div className="grid gap-2 sm:grid-cols-2">
+                              <input
+                                value={edu.school ?? ""}
+                                onChange={(event) => updateEducation(index, "school", event.target.value)}
+                                placeholder="School"
+                                className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                              />
+                              <input
+                                value={edu.degree ?? ""}
+                                onChange={(event) => updateEducation(index, "degree", event.target.value)}
+                                placeholder="Degree"
+                                className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                              />
+                              <input
+                                value={edu.field ?? ""}
+                                onChange={(event) => updateEducation(index, "field", event.target.value)}
+                                placeholder="Field"
+                                className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                              />
+                              <input
+                                value={edu.start_year ?? ""}
+                                onChange={(event) => updateEducation(index, "start_year", event.target.value)}
+                                placeholder="Start year"
+                                className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                              />
+                              <input
+                                value={edu.end_year ?? ""}
+                                onChange={(event) => updateEducation(index, "end_year", event.target.value)}
+                                placeholder="End year"
+                                className="rounded-lg border border-gray-300 px-3 py-2 text-sm sm:col-span-2"
+                              />
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => removeEducation(index)}
+                              className="mt-2 text-xs font-semibold text-red-600"
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>
@@ -300,7 +728,10 @@ export default function ResultPage() {
                   Professional Experience
                 </div>
                 {experience.map((exp: ParsedExperience, index) => (
-                  <div key={`${exp.company ?? "company"}-${index}`} className="relative mb-6 border-l-4 border-gray-200 pl-4">
+                  <div
+                    key={`${exp.company ?? "company"}-${index}`}
+                    className="relative mb-6 border-l-4 border-gray-200 pl-4"
+                  >
                     <h4 className="mb-1 text-lg font-semibold text-gray-900">{exp.title}</h4>
                     <div className="mb-2 text-sm text-gray-500">
                       {exp.company} • {exp.start_date || "N/A"} - {exp.end_date || "Present"} •{" "}
@@ -326,7 +757,10 @@ export default function ResultPage() {
                   Projects
                 </div>
                 {projects.map((project: ParsedProject, index) => (
-                  <div key={`${project.name ?? "project"}-${index}`} className="relative mb-6 border-l-4 border-indigo-100 pl-4">
+                  <div
+                    key={`${project.name ?? "project"}-${index}`}
+                    className="relative mb-6 border-l-4 border-indigo-100 pl-4"
+                  >
                     <h4 className="mb-1 text-lg font-semibold text-gray-900">{project.name}</h4>
                     <div className="mb-2 text-sm text-gray-500">{project.summary}</div>
                     {project.tech_stack && project.tech_stack.length > 0 && (
@@ -344,18 +778,23 @@ export default function ResultPage() {
                         ))}
                       </ul>
                     )}
-                    {project.links?.map((link, i) => (
-                      <div key={`${link}-${i}`}>
-                        <a
-                          href={link}
-                          className="mt-1 block text-xs text-blue-600 hover:underline"
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          {link}
-                        </a>
-                      </div>
-                    ))}
+                    {project.links?.map((link, i) => {
+                      const href = normalizeUrl(link ?? "");
+                      if (!href) return null;
+
+                      return (
+                        <div key={`${link}-${i}`}>
+                          <a
+                            href={href}
+                            className="mt-1 block text-xs text-blue-600 hover:underline"
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            {link}
+                          </a>
+                        </div>
+                      );
+                    })}
                   </div>
                 ))}
               </div>
@@ -367,7 +806,10 @@ export default function ResultPage() {
                   Education
                 </div>
                 {education.map((edu: ParsedEducation, index) => (
-                  <div key={`${edu.school ?? "school"}-${index}`} className="relative mb-6 border-l-4 border-blue-300 pl-4">
+                  <div
+                    key={`${edu.school ?? "school"}-${index}`}
+                    className="relative mb-6 border-l-4 border-blue-300 pl-4"
+                  >
                     <h4 className="mb-1 text-lg font-semibold text-gray-900">{edu.school}</h4>
                     <div className="text-sm text-gray-500">
                       {edu.degree} {edu.field && `in ${edu.field}`} • {edu.start_year} - {edu.end_year}
@@ -416,7 +858,7 @@ export default function ResultPage() {
               <div className="space-y-4 p-4">
                 <div className="rounded-lg border border-gray-200">
                   <div className="flex flex-col gap-2 border-b border-gray-200 p-3 sm:flex-row sm:items-center sm:justify-between">
-                    <p className="text-sm font-semibold text-gray-800">Generated CV (Markdown)</p>
+                    <p className="text-sm font-semibold text-gray-800">Generated CV (PDF)</p>
                     <div className="flex gap-2">
                       <button
                         type="button"
@@ -424,15 +866,15 @@ export default function ResultPage() {
                         disabled={!cvMarkdown}
                         className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
                       >
-                        Copy
+                        Copy Text
                       </button>
                       <button
                         type="button"
-                        onClick={handleDownloadCv}
+                        onClick={handleDownloadCvPdf}
                         disabled={!cvMarkdown}
                         className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
                       >
-                        Download
+                        Download PDF
                       </button>
                     </div>
                   </div>
@@ -465,40 +907,6 @@ export default function ResultPage() {
                   </div>
                   <pre className="max-h-72 overflow-auto whitespace-pre-wrap p-3 text-xs text-gray-700">
                     {githubReadme || "No README export yet. Click \"Generate Exports\"."}
-                  </pre>
-                </div>
-
-                <div className="rounded-lg border border-gray-200">
-                  <div className="flex flex-col gap-2 border-b border-gray-200 p-3 sm:flex-row sm:items-center sm:justify-between">
-                    <p className="text-sm font-semibold text-gray-800">LinkedIn Profile Export</p>
-                    <div className="flex gap-2">
-                      <button
-                        type="button"
-                        onClick={() =>
-                          handleCopy(
-                            JSON.stringify(linkedinProfile ?? {}, null, 2),
-                            "LinkedIn profile JSON"
-                          )
-                        }
-                        disabled={!linkedinProfile}
-                        className="w-fit rounded-md border border-gray-300 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
-                      >
-                        Copy JSON
-                      </button>
-                      <button
-                        type="button"
-                        onClick={handleDownloadLinkedinJson}
-                        disabled={!linkedinProfile}
-                        className="w-fit rounded-md border border-gray-300 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
-                      >
-                        Download JSON
-                      </button>
-                    </div>
-                  </div>
-                  <pre className="max-h-72 overflow-auto whitespace-pre-wrap p-3 text-xs text-gray-700">
-                    {linkedinProfile
-                      ? JSON.stringify(linkedinProfile, null, 2)
-                      : "No LinkedIn export yet. Click \"Generate Exports\"."}
                   </pre>
                 </div>
               </div>
@@ -554,23 +962,28 @@ export default function ResultPage() {
                   <span>{contact.phone || "N/A"}</span>
                 </p>
 
-                {Object.entries(contact.links ?? {}).map(([key, value]) => {
+                {Object.entries(contactLinks).map(([key, value]) => {
                   if (!value || (Array.isArray(value) && value.length === 0)) return null;
-                  const linkUrl = Array.isArray(value) ? value[0] : value;
+                  const links = Array.isArray(value) ? value : [value];
 
-                  return (
-                    <p key={key} className="flex items-center gap-2 text-sm text-gray-600">
-                      <span className="min-w-[60px] capitalize font-semibold text-gray-800">{key}:</span>
-                      <a
-                        href={linkUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="max-w-[150px] truncate text-blue-600 hover:underline"
-                      >
-                        Link
-                      </a>
-                    </p>
-                  );
+                  return links.map((linkUrl, index) => {
+                    const href = normalizeUrl(linkUrl);
+                    if (!href) return null;
+
+                    return (
+                      <p key={`${key}-${index}`} className="flex items-center gap-2 text-sm text-gray-600">
+                        <span className="min-w-[60px] capitalize font-semibold text-gray-800">{key}:</span>
+                        <a
+                          href={href}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="max-w-[150px] truncate text-blue-600 hover:underline"
+                        >
+                          {linkUrl}
+                        </a>
+                      </p>
+                    );
+                  });
                 })}
               </div>
             </div>

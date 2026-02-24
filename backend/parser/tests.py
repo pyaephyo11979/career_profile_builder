@@ -48,10 +48,10 @@ class ResumeProfileExporterTests(SimpleTestCase):
             ],
         }
 
-    def test_export_returns_github_and_linkedin_payloads(self):
+    def test_export_returns_cv_and_github_payloads(self):
         result = self.exporter.export(self.sample)
+        self.assertIn("cv_markdown", result)
         self.assertIn("github_readme", result)
-        self.assertIn("linkedin_profile", result)
 
     def test_github_readme_contains_key_sections(self):
         readme = self.exporter.build_github_readme(self.sample)

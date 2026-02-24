@@ -12,7 +12,6 @@ class ResumeProfileExporter:
         return {
             "cv_markdown": self.build_cv_markdown(parsed_data),
             "github_readme": self.build_github_readme(parsed_data),
-            "linkedin_profile": self.build_linkedin_profile(parsed_data),
         }
 
     def build_cv_markdown(self, parsed_data: Dict[str, Any]) -> str:
