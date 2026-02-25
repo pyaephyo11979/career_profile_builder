@@ -91,7 +91,7 @@ export default function ProfilePage() {
                 <Link
                   key={resume.id}
                   to={`/resumes/${resume.id}`}
-                  className="block rounded-xl border border-slate-200 p-4 transition hover:border-slate-300 hover:bg-slate-50"
+                  className="block rounded-xl border border-slate-200 p-4 transition-colors hover:border-slate-300 hover:bg-slate-200"
                 >
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                     <div>
