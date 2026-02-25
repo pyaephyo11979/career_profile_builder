@@ -759,7 +759,7 @@ export default function ResultPage() {
             )}
 
             {projects.length > 0 && (
-              <div className="mb-10">
+              <div className="mb-10 rounded-lg border border-gray-300 bg-white p-4">
                 <div className="mb-4 border-b-2 border-gray-300 pb-2 text-lg font-bold uppercase tracking-wide text-gray-700">
                   Projects
                 </div>
