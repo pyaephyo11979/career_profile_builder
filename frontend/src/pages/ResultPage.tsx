@@ -436,8 +436,8 @@ export default function ResultPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 font-sans text-gray-800 sm:p-6 md:p-8">
-      <div className="mx-auto max-w-6xl overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
-        <div className="flex flex-col gap-4 border-b border-gray-200 bg-white p-5 sm:flex-row sm:items-start sm:justify-between sm:p-6 md:p-8">
+      <div className="mx-auto max-w-6xl overflow-hidden rounded-xl border border-gray-300 bg-white shadow-sm">
+        <div className="flex flex-col gap-4 border-b border-gray-300 bg-white p-5 sm:flex-row sm:items-start sm:justify-between sm:p-6 md:p-8">
           <div>
             <h2 className="m-0 text-2xl font-bold text-gray-900">{contact.name || resume.file_name}</h2>
             <div className="mt-2 text-sm text-gray-500">
@@ -456,8 +456,8 @@ export default function ResultPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-[1fr_340px]">
           <div className="p-5 sm:p-6 md:p-8">
-            <div className="mb-10 rounded-lg border border-gray-200 bg-white">
-              <div className="flex flex-col gap-3 border-b border-gray-200 p-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="mb-10 rounded-lg border border-gray-300 bg-white">
+              <div className="flex flex-col gap-3 border-b border-gray-300 p-4 sm:flex-row sm:items-center sm:justify-between">
                 <h3 className="text-base font-semibold text-gray-900">Edit Current Information</h3>
                 {!isEditing ? (
                   <button
@@ -559,7 +559,7 @@ export default function ResultPage() {
                       </div>
                       <div className="space-y-4">
                         {experience.map((exp, index) => (
-                          <div key={`exp-${index}`} className="rounded-lg border border-gray-200 p-3">
+                          <div key={`exp-${index}`} className="rounded-lg border border-gray-300 p-3">
                             <div className="mb-3 grid gap-2 sm:grid-cols-2">
                               <input
                                 value={exp.title ?? ""}
@@ -619,7 +619,7 @@ export default function ResultPage() {
                       </div>
                       <div className="space-y-4">
                         {projects.map((project, index) => (
-                          <div key={`project-${index}`} className="rounded-lg border border-gray-200 p-3">
+                          <div key={`project-${index}`} className="rounded-lg border border-gray-300 p-3">
                             <div className="grid gap-2 sm:grid-cols-2">
                               <input
                                 value={project.name ?? ""}
@@ -673,7 +673,7 @@ export default function ResultPage() {
                       </div>
                       <div className="space-y-3">
                         {education.map((edu, index) => (
-                          <div key={`edu-${index}`} className="rounded-lg border border-gray-200 p-3">
+                          <div key={`edu-${index}`} className="rounded-lg border border-gray-300 p-3">
                             <div className="grid gap-2 sm:grid-cols-2">
                               <input
                                 value={edu.school ?? ""}
@@ -723,14 +723,14 @@ export default function ResultPage() {
             </div>
 
             {experience.length > 0 && (
-              <div className="mb-10">
-                <div className="mb-4 border-b-2 border-gray-200 pb-2 text-lg font-bold uppercase tracking-wide text-gray-700">
+              <div className="mb-10 rounded-lg border border-gray-300 bg-white p-4">
+                <div className="mb-4 border-b-2 border-gray-300 pb-2 text-lg font-bold uppercase tracking-wide text-gray-700">
                   Professional Experience
                 </div>
                 {experience.map((exp: ParsedExperience, index) => (
                   <div
                     key={`${exp.company ?? "company"}-${index}`}
-                    className="mb-4 rounded-lg border border-gray-200 bg-gray-50 p-4"
+                    className="mb-4 rounded-lg border border-gray-300 bg-gray-50 p-4"
                   >
                     <div className="flex flex-wrap items-start justify-between gap-2">
                       <div className="min-w-0">
@@ -760,7 +760,7 @@ export default function ResultPage() {
 
             {projects.length > 0 && (
               <div className="mb-10">
-                <div className="mb-4 border-b-2 border-gray-200 pb-2 text-lg font-bold uppercase tracking-wide text-gray-700">
+                <div className="mb-4 border-b-2 border-gray-300 pb-2 text-lg font-bold uppercase tracking-wide text-gray-700">
                   Projects
                 </div>
                 {projects.map((project: ParsedProject, index) => (
@@ -808,8 +808,8 @@ export default function ResultPage() {
             )}
 
             {education.length > 0 && (
-              <div className="mb-10">
-                <div className="mb-4 border-b-2 border-gray-200 pb-2 text-lg font-bold uppercase tracking-wide text-gray-700">
+              <div className="mb-10 rounded-lg border border-gray-300 bg-white p-4">
+                <div className="mb-4 border-b-2 border-gray-300 pb-2 text-lg font-bold uppercase tracking-wide text-gray-700">
                   Education
                 </div>
                 {education.map((edu: ParsedEducation, index) => (
@@ -827,7 +827,7 @@ export default function ResultPage() {
             )}
 
             <div className="mb-10">
-              <details className="overflow-hidden rounded-md border border-gray-200">
+              <details className="overflow-hidden rounded-md border border-gray-300">
                 <summary className="cursor-pointer bg-gray-50 p-4 font-semibold text-gray-700 hover:bg-gray-100">
                   View Raw Extracted Text
                 </summary>
@@ -837,8 +837,8 @@ export default function ResultPage() {
               </details>
             </div>
 
-            <div className="mb-10 rounded-lg border border-gray-200 bg-white">
-              <div className="flex flex-col gap-3 border-b border-gray-200 p-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="mb-10 rounded-lg border border-gray-300 bg-white">
+              <div className="flex flex-col gap-3 border-b border-gray-300 p-4 sm:flex-row sm:items-center sm:justify-between">
                 <h3 className="text-base font-semibold text-gray-900">Profile Exports</h3>
                 <button
                   type="button"
@@ -863,8 +863,8 @@ export default function ResultPage() {
               )}
 
               <div className="space-y-4 p-4">
-                <div className="rounded-lg border border-gray-200">
-                  <div className="flex flex-col gap-2 border-b border-gray-200 p-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="rounded-lg border border-gray-300">
+                  <div className="flex flex-col gap-2 border-b border-gray-300 p-3 sm:flex-row sm:items-center sm:justify-between">
                     <p className="text-sm font-semibold text-gray-800">Generated CV (PDF)</p>
                     <div className="flex gap-2">
                       <button
@@ -890,8 +890,8 @@ export default function ResultPage() {
                   </pre>
                 </div>
 
-                <div className="rounded-lg border border-gray-200">
-                  <div className="flex flex-col gap-2 border-b border-gray-200 p-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="rounded-lg border border-gray-300">
+                  <div className="flex flex-col gap-2 border-b border-gray-300 p-3 sm:flex-row sm:items-center sm:justify-between">
                     <p className="text-sm font-semibold text-gray-800">GitHub README Export</p>
                     <div className="flex gap-2">
                       <button
@@ -920,8 +920,8 @@ export default function ResultPage() {
             </div>
           </div>
 
-          <div className="border-t border-gray-200 bg-gray-50 p-5 sm:p-6 md:border-l md:border-t-0 md:p-8">
-            <div className="mb-8 rounded-lg border border-gray-200 bg-white p-6 text-center shadow-sm">
+          <div className="border-t border-gray-300 bg-gray-50 p-5 sm:p-6 md:border-l md:border-t-0 md:p-8">
+            <div className="mb-8 rounded-lg border border-gray-300 bg-white p-6 text-center shadow-sm">
               <div
                 className={`mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full text-2xl font-extrabold text-white ${getScoreColor(
                   score
@@ -956,7 +956,7 @@ export default function ResultPage() {
             </div>
 
             <div className="mb-10">
-              <div className="mb-4 border-b border-gray-200 pb-2 text-sm font-bold uppercase tracking-wide text-gray-700">
+              <div className="mb-4 border-b border-gray-300 pb-2 text-sm font-bold uppercase tracking-wide text-gray-700">
                 Contact Details
               </div>
               <div className="space-y-3">
@@ -996,7 +996,7 @@ export default function ResultPage() {
             </div>
 
             <div className="mb-10">
-              <div className="mb-4 border-b border-gray-200 pb-2 text-sm font-bold uppercase tracking-wide text-gray-700">
+              <div className="mb-4 border-b border-gray-300 pb-2 text-sm font-bold uppercase tracking-wide text-gray-700">
                 Skills Detected
               </div>
               {Object.entries(skillsByCategory).map(([category, categorySkills]) =>
