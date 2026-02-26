@@ -38,28 +38,28 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen w-full bg-gray-50 flex items-center justify-center px-4">
-      <div className="bg-white p-8 rounded-2xl shadow-[0_0_40px_rgba(0,0,0,0.2)] w-full max-w-md">
-        <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">
+    <div className="min-h-screen w-full bg-transparent flex items-center justify-center px-4">
+      <div className="w-full max-w-md rounded-2xl border border-white/10 bg-white/5 p-8 text-white backdrop-blur-md shadow-[0_18px_30px_rgba(0,0,0,0.35)]">
+        <h2 className="mb-6 text-center text-2xl font-bold text-white">
           Login
         </h2>
 
         {error && (
-          <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          <div className="mb-4 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
             {error}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="mb-1 block text-sm font-medium text-white/80">
               Username
             </label>
             <input
               type="text"
               name="username"
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+              className="w-full rounded-lg border border-white/15 bg-white/5 px-4 py-2 text-white placeholder:text-white/40 outline-none transition focus:border-[#3B5BFF] focus:ring-2 focus:ring-[#3B5BFF]"
               placeholder="Enter username"
               value={formData.username}
               onChange={handleChange}
@@ -69,14 +69,14 @@ const Login = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="mb-1 block text-sm font-medium text-white/80">
               Password
             </label>
             <input
               type="password"
               name="password"
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+              className="w-full rounded-lg border border-white/15 bg-white/5 px-4 py-2 text-white placeholder:text-white/40 outline-none transition focus:border-[#3B5BFF] focus:ring-2 focus:ring-[#3B5BFF]"
               placeholder="••••••••"
               value={formData.password}
               onChange={handleChange}
@@ -87,18 +87,18 @@ const Login = () => {
 
           <button
             type="submit"
-            className="w-full bg-[#032b2b] hover:bg-[#043d3d] text-white font-semibold py-2.5 rounded-lg transition duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
+            className="w-full rounded-lg bg-[#3B5BFF] py-2.5 font-semibold text-white transition duration-200 hover:bg-[#2F4CF5] disabled:cursor-not-allowed disabled:opacity-60"
             disabled={isSubmitting}
           >
             {isSubmitting ? "Signing in..." : "Sign In"}
           </button>
         </form>
 
-        <p className="mt-4 text-center text-sm text-gray-600">
+        <p className="mt-4 text-center text-sm text-white/60">
           Don't have an account?{" "}
           <Link
             to="/register"
-            className="text-blue-600 hover:text-blue-800 font-medium"
+            className="font-medium text-[#3B5BFF] hover:underline"
           >
             Register
           </Link>
