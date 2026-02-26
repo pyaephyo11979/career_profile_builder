@@ -5,12 +5,12 @@ export default function Navbar() {
   const { isAuthenticated, logout } = useAuth();
 
   return (
-    <header className="w-full bg-[#F3F5F7] pb-2 pt-4 sm:pt-6 flex justify-center">
-      <div className="mx-auto w-full max-w-[1200px] px-4 sm:px-6">
-        <div className="bg-white rounded-2xl sm:rounded-full shadow-sm border border-gray-100 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between px-4 py-3 sm:px-6">
+    <header className="w-full bg-[#090E34] pb-2 pt-4 sm:pt-6 flex justify-center">
+      <div className="mx-auto w-full max-w-300 px-4 sm:px-6">
+        <div className="rounded-2xl sm:rounded-full border border-white/10 bg-white/10 backdrop-blur-md flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between px-4 py-3 sm:px-6">
           {/* Left: Brand */}
           <div className="flex items-center gap-6">
-            <Link to="/" className="text-[20px] font-bold text-[#0F172A] tracking-tight">
+            <Link to="/" className="text-[20px] font-bold text-white tracking-tight">
               Career Profile Builder
             </Link>
           </div>
@@ -21,20 +21,20 @@ export default function Navbar() {
               <>
                 <Link
                   to="/profile"
-                  className="h-10 px-3 sm:px-5 inline-flex items-center justify-center rounded-xl sm:rounded-full border border-[#032b2b] bg-white text-[#032b2b] text-[13px] sm:text-[14px] font-semibold hover:bg-[#e9f5f5] transition-all"
+                  className="h-10 px-3 sm:px-5 inline-flex items-center justify-center rounded-xl sm:rounded-full border border-white/15 bg-white/10 text-white text-[13px] sm:text-[14px] font-semibold hover:bg-white/15 transition-all"
                 >
                   Profile
                 </Link>
                 <Link
                   to="/upload"
-                  className="h-10 px-3 sm:px-5 inline-flex items-center justify-center rounded-xl sm:rounded-full bg-[#032b2b] text-white text-[13px] sm:text-[14px] font-semibold hover:bg-[#043d3d] transition-all"
+                  className="h-10 px-3 sm:px-5 inline-flex items-center justify-center rounded-xl sm:rounded-full bg-[#3B5BFF] text-white text-[13px] sm:text-[14px] font-semibold hover:bg-[#2F4CF5] transition-all"
                 >
                   Upload
                 </Link>
                 <button
                   type="button"
                   onClick={logout}
-                  className="col-span-2 h-10 px-3 sm:px-5 inline-flex items-center justify-center rounded-xl sm:rounded-full border border-gray-300 bg-white text-[#0F172A] text-[13px] sm:text-[14px] font-semibold hover:bg-gray-100 transition-all"
+                  className="col-span-2 h-10 px-3 sm:px-5 inline-flex items-center justify-center rounded-xl sm:rounded-full border border-white/15 bg-white/10 text-white text-[13px] sm:text-[14px] font-semibold hover:bg-white/15 transition-all"
                 >
                   Logout
                 </button>
@@ -43,13 +43,13 @@ export default function Navbar() {
               <>
                 <Link
                   to="/login"
-                  className="h-10 px-3 sm:px-6 inline-flex items-center justify-center rounded-xl sm:rounded-full bg-[#032b2b] text-white text-[13px] sm:text-[14px] font-semibold hover:bg-[#043d3d] transition-all"
+                  className="h-10 px-3 sm:px-6 inline-flex items-center justify-center rounded-xl sm:rounded-full border border-white/15 bg-white/10 text-white text-[13px] sm:text-[14px] font-semibold hover:bg-white/15 transition-all"
                 >
                   Sign in
                 </Link>
                 <Link
                   to="/register"
-                  className="h-10 px-3 sm:px-6 inline-flex items-center justify-center rounded-xl sm:rounded-full bg-[#032b2b] text-white text-[13px] sm:text-[14px] font-semibold hover:bg-[#043d3d] transition-all shadow-md"
+                  className="h-10 px-3 sm:px-6 inline-flex items-center justify-center rounded-xl sm:rounded-full bg-[#3B5BFF] text-white text-[13px] sm:text-[14px] font-semibold hover:bg-[#2F4CF5] transition-all shadow-md"
                 >
                   Sign up
                 </Link>

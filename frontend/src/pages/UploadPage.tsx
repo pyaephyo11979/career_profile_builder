@@ -91,14 +91,14 @@ export default function UploadPage() {
   }, [file]);
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-transparent text-white">
       <div className="mx-auto max-w-5xl px-4 py-6 sm:py-8 md:py-10">
         {/* Header */}
         <header className="mb-8">
-          <h1 className="text-2xl font-semibold tracking-tight text-slate-900">
+          <h1 className="text-2xl font-semibold tracking-tight text-white">
             Upload your resume
           </h1>
-          <p className="mt-2 text-sm text-slate-600">
+          <p className="mt-2 text-sm text-white/70">
             Choose a file to upload. We’ll parse it and show structured results.
           </p>
         </header>
@@ -106,16 +106,16 @@ export default function UploadPage() {
         <div className="grid gap-6 lg:grid-cols-12">
           {/* Left: Upload Card */}
           <section className="lg:col-span-5">
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md p-6 shadow-[0_18px_30px_rgba(0,0,0,0.35)]">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <h2 className="text-sm font-medium text-slate-900">
+                  <h2 className="text-sm font-medium text-white">
                     Resume file
                   </h2>
-                  <p className="mt-1 text-xs text-slate-500">{fileHint}</p>
+                  <p className="mt-1 text-xs text-white/60">{fileHint}</p>
                 </div>
 
-                <span className="rounded-full bg-slate-100 px-2 py-1 text-xs text-slate-600">
+                <span className="rounded-full bg-white/10 px-2 py-1 text-xs text-white/70">
                   ≤ 5MB
                 </span>
               </div>
@@ -124,13 +124,13 @@ export default function UploadPage() {
               <label className="mt-5 block">
                 <span className="sr-only">Choose resume file</span>
 
-                <div className="rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 p-6 transition hover:border-slate-300">
+                <div className="rounded-2xl border-2 border-dashed border-white/15 bg-white/5 p-6 transition hover:border-white/25">
                   <div className="flex items-center gap-4">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white shadow-sm ring-1 ring-slate-200">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/10 ring-1 ring-white/10">
                       <svg
                         viewBox="0 0 24 24"
                         fill="none"
-                        className="h-6 w-6 text-slate-700"
+                        className="h-6 w-6 text-white/80"
                         aria-hidden="true"
                       >
                         <path
@@ -151,10 +151,10 @@ export default function UploadPage() {
                     </div>
 
                     <div className="min-w-0">
-                      <p className="text-sm font-medium text-slate-900">
+                      <p className="text-sm font-medium text-white">
                         Drag & drop your resume here
                       </p>
-                      <p className="mt-1 text-xs text-slate-600">
+                      <p className="mt-1 text-xs text-white/70">
                         Or click to browse your files
                       </p>
                     </div>
@@ -164,9 +164,9 @@ export default function UploadPage() {
                     type="file"
                     accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                     onChange={handleFileChange}
-                    className="mt-4 block w-full cursor-pointer rounded-xl border border-slate-200 bg-white text-sm text-slate-700
-                               file:mr-4 file:rounded-lg file:border-0 file:bg-[#032b2b] file:px-4 file:py-2 file:text-sm file:font-medium file:text-white
-                               hover:file:bg-[#043d3d] focus:outline-none focus:ring-2 focus:ring-slate-400"
+                    className="mt-4 block w-full cursor-pointer rounded-xl border border-white/15 bg-white/5 text-sm text-white/80
+                               file:mr-4 file:rounded-lg file:border-0 file:bg-[#3B5BFF] file:px-4 file:py-2 file:text-sm file:font-medium file:text-white
+                               hover:file:bg-[#2F4CF5] focus:outline-none focus:ring-2 focus:ring-white/20"
                   />
                 </div>
               </label>
@@ -175,8 +175,8 @@ export default function UploadPage() {
                 <div
                   className={`mt-5 rounded-lg border px-4 py-3 text-sm ${
                     error
-                      ? "border-red-200 bg-red-50 text-red-700"
-                      : "border-emerald-200 bg-emerald-50 text-emerald-700"
+                      ? "border-red-500/30 bg-red-500/10 text-red-200"
+                      : "border-emerald-500/30 bg-emerald-500/10 text-emerald-200"
                   }`}
                 >
                   {error ?? status}
@@ -187,7 +187,7 @@ export default function UploadPage() {
               <div className="mt-5 grid gap-3 sm:grid-cols-2">
                 <button
                   type="button"
-                  className="inline-flex w-full items-center justify-center rounded-xl bg-[#032b2b] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#043d3d] disabled:cursor-not-allowed disabled:opacity-60"
+                  className="inline-flex w-full items-center justify-center rounded-xl bg-[#3B5BFF] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#2F4CF5] disabled:cursor-not-allowed disabled:opacity-60"
                   onClick={handleUpload}
                   disabled={isUploading || !file}
                 >
@@ -196,7 +196,7 @@ export default function UploadPage() {
 
                 <button
                   type="button"
-                  className="inline-flex w-full items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-900 hover:bg-slate-50"
+                  className="inline-flex w-full items-center justify-center rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-sm font-medium text-white hover:bg-white/10"
                   onClick={handleClear}
                   disabled={isUploading}
                 >
@@ -205,8 +205,8 @@ export default function UploadPage() {
               </div>
 
               {/* Helper panel */}
-              <div className="mt-5 rounded-xl bg-slate-50 p-4 text-xs text-slate-600">
-                <p className="font-medium text-slate-800">Supported formats</p>
+              <div className="mt-5 rounded-xl border border-white/10 bg-white/5 p-4 text-xs text-white/70">
+                <p className="font-medium text-white">Supported formats</p>
                 <ul className="mt-2 list-disc space-y-1 pl-5">
                   <li>PDF (.pdf)</li>
                   <li>Word (.docx)</li>
@@ -218,15 +218,15 @@ export default function UploadPage() {
 
           {/* Right: Preview + Placeholder Results */}
           <section className="lg:col-span-7">
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md p-6 shadow-[0_18px_30px_rgba(0,0,0,0.35)]">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <h2 className="text-sm font-medium text-slate-900">
+                  <h2 className="text-sm font-medium text-white">
                     Preview
                   </h2>
                 </div>
 
-                <span className="rounded-full bg-indigo-50 px-2 py-1 text-xs font-medium text-indigo-700">
+                <span className="rounded-full bg-white/10 px-2 py-1 text-xs font-medium text-white/80">
                   Demo
                 </span>
               </div>
@@ -234,7 +234,7 @@ export default function UploadPage() {
               {preview && (
                   <iframe
                   src={preview}
-                  className="mt-6 h-[420px] sm:h-[520px] md:h-[600px] w-full rounded-xl border border-slate-200 bg-slate-50"
+                  className="mt-6 h-105 w-full rounded-xl border border-white/10 bg-white/5 sm:h-130 md:h-150"
                   title="Resume Preview"
                 >
                   This browser does not support PDFs. Please download the PDF to
@@ -243,12 +243,12 @@ export default function UploadPage() {
               )}
 
               {!file ? (
-                <div className="mt-6 rounded-2xl border border-dashed border-slate-200 p-10 text-center">
-                  <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100">
+                <div className="mt-6 rounded-2xl border border-dashed border-white/15 p-10 text-center">
+                  <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-white/10">
                     <svg
                       viewBox="0 0 24 24"
                       fill="none"
-                      className="h-6 w-6 text-slate-600"
+                      className="h-6 w-6 text-white/70"
                       aria-hidden="true"
                     >
                       <path
@@ -266,10 +266,10 @@ export default function UploadPage() {
                     </svg>
                   </div>
 
-                  <p className="mt-4 text-sm font-medium text-slate-900">
+                  <p className="mt-4 text-sm font-medium text-white">
                     No file selected
                   </p>
-                  <p className="mt-1 text-xs text-slate-500">
+                  <p className="mt-1 text-xs text-white/60">
                     Choose a resume to see its name, size, and a sample “parsed
                     result” layout.
                   </p>
@@ -277,25 +277,25 @@ export default function UploadPage() {
               ) : (
                 <div className="mt-6 space-y-5">
                   {/* File summary */}
-                  <div className="rounded-2xl bg-slate-50 p-4">
+                  <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
-                        <p className="text-xs text-slate-500">Selected file</p>
-                        <p className="mt-1 truncate text-sm font-medium text-slate-900">
+                        <p className="text-xs text-white/60">Selected file</p>
+                        <p className="mt-1 truncate text-sm font-medium text-white">
                           {file.name}
                         </p>
-                        <p className="mt-1 text-xs text-slate-600">
+                        <p className="mt-1 text-xs text-white/70">
                           {(file.size / (1024 * 1024)).toFixed(2)} MB
                         </p>
                       </div>
 
-                      <span className="rounded-full bg-emerald-50 px-2 py-1 text-xs font-medium text-emerald-700">
+                      <span className="rounded-full bg-emerald-500/10 px-2 py-1 text-xs font-medium text-emerald-200 border border-emerald-500/30">
                         Ready
                       </span>
                     </div>
                   </div>
                   {!preview && (
-                    <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-xs text-slate-600">
+                    <div className="rounded-xl border border-white/10 bg-white/5 p-4 text-xs text-white/70">
                       Preview is available for PDF files only. DOC/DOCX uploads will still parse correctly.
                     </div>
                   )}

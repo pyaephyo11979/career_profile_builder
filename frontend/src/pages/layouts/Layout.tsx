@@ -6,7 +6,7 @@ export default function Layout() {
   const nodeRef = useRef(null);
 
   return (
-    <div>
+    <div className="min-h-screen bg-[#090E34]">
       <Navbar />
       <div ref={nodeRef}>
         <Outlet />

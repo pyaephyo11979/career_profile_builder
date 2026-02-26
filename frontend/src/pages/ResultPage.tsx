@@ -223,13 +223,13 @@ export default function ResultPage() {
   }, [auth, navigate, resumeId]);
 
   if (error) {
-    return <div className="p-8 text-red-500">Error: {error}</div>;
+    return <div className="p-8 text-red-200">Error: {error}</div>;
   }
   if (loading) {
-    return <div className="p-8 text-gray-500">Loading analysis...</div>;
+    return <div className="p-8 text-white/60">Loading analysis...</div>;
   }
   if (!resume) {
-    return <div className="p-8 text-gray-500">No resume found.</div>;
+    return <div className="p-8 text-white/60">No resume found.</div>;
   }
 
   const parsedData = resume.parsed_data ?? {};
@@ -435,19 +435,21 @@ export default function ResultPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 font-sans text-gray-800 sm:p-6 md:p-8">
-      <div className="mx-auto max-w-6xl overflow-hidden rounded-xl border border-gray-300 bg-white shadow-sm">
-        <div className="flex flex-col gap-4 border-b border-gray-300 bg-white p-5 sm:flex-row sm:items-start sm:justify-between sm:p-6 md:p-8">
+    <div className="min-h-screen bg-transparent p-4 font-sans text-white sm:p-6 md:p-8">
+      <div className="mx-auto max-w-6xl overflow-hidden rounded-xl border border-white/10 bg-white/5 backdrop-blur-md shadow-[0_18px_30px_rgba(0,0,0,0.35)]">
+        <div className="flex flex-col gap-4 border-b border-white/10 bg-white/5 p-5 sm:flex-row sm:items-start sm:justify-between sm:p-6 md:p-8">
           <div>
-            <h2 className="m-0 text-2xl font-bold text-gray-900">{contact.name || resume.file_name}</h2>
-            <div className="mt-2 text-sm text-gray-500">
+            <h2 className="m-0 text-2xl font-bold text-white">{contact.name || resume.file_name}</h2>
+            <div className="mt-2 text-sm text-white/60">
               ID: #{resume.id} • Uploaded:{" "}
               {resume.created_at ? new Date(resume.created_at).toLocaleDateString() : "N/A"}
             </div>
           </div>
           <span
             className={`inline-block rounded-full px-3 py-1 text-sm font-medium ${
-              resume.is_confirmed ? "bg-emerald-100 text-emerald-800" : "bg-gray-100 text-gray-700"
+              resume.is_confirmed
+                ? "border border-emerald-500/30 bg-emerald-500/10 text-emerald-200"
+                : "border border-white/10 bg-white/10 text-white/70"
             }`}
           >
             {resume.is_confirmed ? "Confirmed Quote" : "Analysis Pending"}
@@ -456,14 +458,14 @@ export default function ResultPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-[1fr_340px]">
           <div className="p-5 sm:p-6 md:p-8">
-            <div className="mb-10 rounded-lg border border-gray-300 bg-white">
-              <div className="flex flex-col gap-3 border-b border-gray-300 p-4 sm:flex-row sm:items-center sm:justify-between">
-                <h3 className="text-base font-semibold text-gray-900">Edit Current Information</h3>
+            <div className="mb-10 rounded-lg border border-white/10 bg-white/5">
+              <div className="flex flex-col gap-3 border-b border-white/10 p-4 sm:flex-row sm:items-center sm:justify-between">
+                <h3 className="text-base font-semibold text-white">Edit Current Information</h3>
                 {!isEditing ? (
                   <button
                     type="button"
                     onClick={handleStartEdit}
-                    className="inline-flex h-10 items-center justify-center rounded-lg bg-[#032b2b] px-4 text-sm font-semibold text-white hover:bg-[#043d3d]"
+                    className="inline-flex h-10 items-center justify-center rounded-lg bg-[#3B5BFF] px-4 text-sm font-semibold text-white hover:bg-[#2F4CF5]"
                   >
                     Edit Details
                   </button>
@@ -473,7 +475,7 @@ export default function ResultPage() {
                       type="button"
                       onClick={handleSaveEdits}
                       disabled={isSaving}
-                      className="inline-flex h-10 items-center justify-center rounded-lg bg-[#032b2b] px-4 text-sm font-semibold text-white hover:bg-[#043d3d] disabled:cursor-not-allowed disabled:opacity-60"
+                      className="inline-flex h-10 items-center justify-center rounded-lg bg-[#3B5BFF] px-4 text-sm font-semibold text-white hover:bg-[#2F4CF5] disabled:cursor-not-allowed disabled:opacity-60"
                     >
                       {isSaving ? "Saving..." : "Save & Regenerate"}
                     </button>
@@ -481,7 +483,7 @@ export default function ResultPage() {
                       type="button"
                       onClick={handleCancelEdit}
                       disabled={isSaving}
-                      className="inline-flex h-10 items-center justify-center rounded-lg border border-gray-300 bg-white px-4 text-sm font-semibold text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+                      className="inline-flex h-10 items-center justify-center rounded-lg border border-white/15 bg-white/5 px-4 text-sm font-semibold text-white hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60"
                     >
                       Cancel
                     </button>
@@ -493,8 +495,8 @@ export default function ResultPage() {
                 <div
                   className={`mx-4 mt-4 rounded-lg border px-3 py-2 text-sm ${
                     editError
-                      ? "border-red-200 bg-red-50 text-red-700"
-                      : "border-emerald-200 bg-emerald-50 text-emerald-700"
+                      ? "border-red-500/30 bg-red-500/10 text-red-200"
+                      : "border-emerald-500/30 bg-emerald-500/10 text-emerald-200"
                   }`}
                 >
                   {editError ?? editStatus}
@@ -503,105 +505,105 @@ export default function ResultPage() {
 
               <div className="p-4">
                 {!isEditing ? (
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-white/70">
                     Edit your extracted details directly in the web form, then save to regenerate updated exports.
                   </p>
                 ) : (
                   <div className="space-y-6">
                     <div>
-                      <h4 className="mb-3 text-sm font-semibold text-gray-800">Contact</h4>
+                      <h4 className="mb-3 text-sm font-semibold text-white">Contact</h4>
                       <div className="grid gap-3 sm:grid-cols-2">
                         <input
                           value={contact.name ?? ""}
                           onChange={(event) => updateContactField("name", event.target.value)}
                           placeholder="Full name"
-                          className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                          className="rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-white/40 focus:border-[#3B5BFF] focus:outline-none focus:ring-1 focus:ring-[#3B5BFF]"
                         />
                         <input
                           value={contact.email ?? ""}
                           onChange={(event) => updateContactField("email", event.target.value)}
                           placeholder="Email"
-                          className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                          className="rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-white/40 focus:border-[#3B5BFF] focus:outline-none focus:ring-1 focus:ring-[#3B5BFF]"
                         />
                         <input
                           value={contact.phone ?? ""}
                           onChange={(event) => updateContactField("phone", event.target.value)}
                           placeholder="Phone"
-                          className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                          className="rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-white/40 focus:border-[#3B5BFF] focus:outline-none focus:ring-1 focus:ring-[#3B5BFF]"
                         />
                         <input
                           value={typeof contactLinks.github === "string" ? contactLinks.github : ""}
                           onChange={(event) => updateContactLinks("github", event.target.value)}
                           placeholder="GitHub URL"
-                          className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                          className="rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-white/40 focus:border-[#3B5BFF] focus:outline-none focus:ring-1 focus:ring-[#3B5BFF]"
                         />
                         <input
                           value={typeof contactLinks.linkedin === "string" ? contactLinks.linkedin : ""}
                           onChange={(event) => updateContactLinks("linkedin", event.target.value)}
                           placeholder="LinkedIn URL"
-                          className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                          className="rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-white/40 focus:border-[#3B5BFF] focus:outline-none focus:ring-1 focus:ring-[#3B5BFF]"
                         />
                         <textarea
                           value={toLineText(Array.isArray(contactLinks.other) ? contactLinks.other : [])}
                           onChange={(event) => updateContactLinks("other", toLines(event.target.value))}
                           placeholder="Other links (one per line)"
-                          className="h-24 rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                          className="h-24 rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-white/40 focus:border-[#3B5BFF] focus:outline-none focus:ring-1 focus:ring-[#3B5BFF]"
                         />
                       </div>
                     </div>
 
                     <div>
                       <div className="mb-3 flex items-center justify-between">
-                        <h4 className="text-sm font-semibold text-gray-800">Experience</h4>
-                        <button type="button" onClick={addExperience} className="text-xs font-semibold text-[#032b2b]">
+                        <h4 className="text-sm font-semibold text-white">Experience</h4>
+                        <button type="button" onClick={addExperience} className="text-xs font-semibold text-[#3B5BFF]">
                           + Add Experience
                         </button>
                       </div>
                       <div className="space-y-4">
                         {experience.map((exp, index) => (
-                          <div key={`exp-${index}`} className="rounded-lg border border-gray-300 p-3">
+                          <div key={`exp-${index}`} className="rounded-lg border border-white/10 bg-white/5 p-3">
                             <div className="mb-3 grid gap-2 sm:grid-cols-2">
                               <input
                                 value={exp.title ?? ""}
                                 onChange={(event) => updateExperience(index, "title", event.target.value)}
                                 placeholder="Title"
-                                className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                                className="rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-white/40 focus:border-[#3B5BFF] focus:outline-none focus:ring-1 focus:ring-[#3B5BFF]"
                               />
                               <input
                                 value={exp.company ?? ""}
                                 onChange={(event) => updateExperience(index, "company", event.target.value)}
                                 placeholder="Company"
-                                className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                                className="rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-white/40 focus:border-[#3B5BFF] focus:outline-none focus:ring-1 focus:ring-[#3B5BFF]"
                               />
                               <input
                                 value={exp.start_date ?? ""}
                                 onChange={(event) => updateExperience(index, "start_date", event.target.value)}
                                 placeholder="Start date"
-                                className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                                className="rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-white/40 focus:border-[#3B5BFF] focus:outline-none focus:ring-1 focus:ring-[#3B5BFF]"
                               />
                               <input
                                 value={exp.end_date ?? ""}
                                 onChange={(event) => updateExperience(index, "end_date", event.target.value)}
                                 placeholder="End date"
-                                className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                                className="rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-white/40 focus:border-[#3B5BFF] focus:outline-none focus:ring-1 focus:ring-[#3B5BFF]"
                               />
                               <input
                                 value={exp.location ?? ""}
                                 onChange={(event) => updateExperience(index, "location", event.target.value)}
                                 placeholder="Location"
-                                className="rounded-lg border border-gray-300 px-3 py-2 text-sm sm:col-span-2"
+                                className="rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-white/40 focus:border-[#3B5BFF] focus:outline-none focus:ring-1 focus:ring-[#3B5BFF] sm:col-span-2"
                               />
                             </div>
                             <textarea
                               value={toLineText(exp.highlights)}
                               onChange={(event) => updateExperience(index, "highlights", toLines(event.target.value))}
                               placeholder="Highlights (one per line)"
-                              className="h-20 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                              className="h-20 w-full rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-white/40 focus:border-[#3B5BFF] focus:outline-none focus:ring-1 focus:ring-[#3B5BFF]"
                             />
                             <button
                               type="button"
                               onClick={() => removeExperience(index)}
-                              className="mt-2 text-xs font-semibold text-red-600"
+                              className="mt-2 text-xs font-semibold text-red-200 hover:text-red-100"
                             >
                               Remove
                             </button>
@@ -612,50 +614,50 @@ export default function ResultPage() {
 
                     <div>
                       <div className="mb-3 flex items-center justify-between">
-                        <h4 className="text-sm font-semibold text-gray-800">Projects</h4>
-                        <button type="button" onClick={addProject} className="text-xs font-semibold text-[#032b2b]">
+                        <h4 className="text-sm font-semibold text-white">Projects</h4>
+                        <button type="button" onClick={addProject} className="text-xs font-semibold text-[#3B5BFF]">
                           + Add Project
                         </button>
                       </div>
                       <div className="space-y-4">
                         {projects.map((project, index) => (
-                          <div key={`project-${index}`} className="rounded-lg border border-gray-300 p-3">
+                          <div key={`project-${index}`} className="rounded-lg border border-white/10 bg-white/5 p-3">
                             <div className="grid gap-2 sm:grid-cols-2">
                               <input
                                 value={project.name ?? ""}
                                 onChange={(event) => updateProject(index, "name", event.target.value)}
                                 placeholder="Project name"
-                                className="rounded-lg border border-gray-300 px-3 py-2 text-sm sm:col-span-2"
+                                className="rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-white/40 focus:border-[#3B5BFF] focus:outline-none focus:ring-1 focus:ring-[#3B5BFF] sm:col-span-2"
                               />
                               <textarea
                                 value={project.summary ?? ""}
                                 onChange={(event) => updateProject(index, "summary", event.target.value)}
                                 placeholder="Summary"
-                                className="h-20 rounded-lg border border-gray-300 px-3 py-2 text-sm sm:col-span-2"
+                                className="h-20 rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-white/40 focus:border-[#3B5BFF] focus:outline-none focus:ring-1 focus:ring-[#3B5BFF] sm:col-span-2"
                               />
                               <textarea
                                 value={toLineText(project.highlights)}
                                 onChange={(event) => updateProject(index, "highlights", toLines(event.target.value))}
                                 placeholder="Highlights (one per line)"
-                                className="h-20 rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                                className="h-20 rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-white/40 focus:border-[#3B5BFF] focus:outline-none focus:ring-1 focus:ring-[#3B5BFF]"
                               />
                               <textarea
                                 value={toLineText(project.links)}
                                 onChange={(event) => updateProject(index, "links", toLines(event.target.value))}
                                 placeholder="Links (one per line)"
-                                className="h-20 rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                                className="h-20 rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-white/40 focus:border-[#3B5BFF] focus:outline-none focus:ring-1 focus:ring-[#3B5BFF]"
                               />
                               <input
                                 value={toCsvText(project.tech_stack)}
                                 onChange={(event) => updateProject(index, "tech_stack", fromCsvText(event.target.value))}
                                 placeholder="Tech stack (comma separated)"
-                                className="rounded-lg border border-gray-300 px-3 py-2 text-sm sm:col-span-2"
+                                className="rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-white/40 focus:border-[#3B5BFF] focus:outline-none focus:ring-1 focus:ring-[#3B5BFF] sm:col-span-2"
                               />
                             </div>
                             <button
                               type="button"
                               onClick={() => removeProject(index)}
-                              className="mt-2 text-xs font-semibold text-red-600"
+                              className="mt-2 text-xs font-semibold text-red-200 hover:text-red-100"
                             >
                               Remove
                             </button>
@@ -666,50 +668,50 @@ export default function ResultPage() {
 
                     <div>
                       <div className="mb-3 flex items-center justify-between">
-                        <h4 className="text-sm font-semibold text-gray-800">Education</h4>
-                        <button type="button" onClick={addEducation} className="text-xs font-semibold text-[#032b2b]">
+                        <h4 className="text-sm font-semibold text-white">Education</h4>
+                        <button type="button" onClick={addEducation} className="text-xs font-semibold text-[#3B5BFF]">
                           + Add Education
                         </button>
                       </div>
                       <div className="space-y-3">
                         {education.map((edu, index) => (
-                          <div key={`edu-${index}`} className="rounded-lg border border-gray-300 p-3">
+                          <div key={`edu-${index}`} className="rounded-lg border border-white/10 bg-white/5 p-3">
                             <div className="grid gap-2 sm:grid-cols-2">
                               <input
                                 value={edu.school ?? ""}
                                 onChange={(event) => updateEducation(index, "school", event.target.value)}
                                 placeholder="School"
-                                className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                                className="rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-white/40 focus:border-[#3B5BFF] focus:outline-none focus:ring-1 focus:ring-[#3B5BFF]"
                               />
                               <input
                                 value={edu.degree ?? ""}
                                 onChange={(event) => updateEducation(index, "degree", event.target.value)}
                                 placeholder="Degree"
-                                className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                                className="rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-white/40 focus:border-[#3B5BFF] focus:outline-none focus:ring-1 focus:ring-[#3B5BFF]"
                               />
                               <input
                                 value={edu.field ?? ""}
                                 onChange={(event) => updateEducation(index, "field", event.target.value)}
                                 placeholder="Field"
-                                className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                                className="rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-white/40 focus:border-[#3B5BFF] focus:outline-none focus:ring-1 focus:ring-[#3B5BFF]"
                               />
                               <input
                                 value={edu.start_year ?? ""}
                                 onChange={(event) => updateEducation(index, "start_year", event.target.value)}
                                 placeholder="Start year"
-                                className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                                className="rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-white/40 focus:border-[#3B5BFF] focus:outline-none focus:ring-1 focus:ring-[#3B5BFF]"
                               />
                               <input
                                 value={edu.end_year ?? ""}
                                 onChange={(event) => updateEducation(index, "end_year", event.target.value)}
                                 placeholder="End year"
-                                className="rounded-lg border border-gray-300 px-3 py-2 text-sm sm:col-span-2"
+                                className="rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-white/40 focus:border-[#3B5BFF] focus:outline-none focus:ring-1 focus:ring-[#3B5BFF] sm:col-span-2"
                               />
                             </div>
                             <button
                               type="button"
                               onClick={() => removeEducation(index)}
-                              className="mt-2 text-xs font-semibold text-red-600"
+                              className="mt-2 text-xs font-semibold text-red-200 hover:text-red-100"
                             >
                               Remove
                             </button>
@@ -723,31 +725,31 @@ export default function ResultPage() {
             </div>
 
             {experience.length > 0 && (
-              <div className="mb-10 rounded-lg border border-gray-300 bg-white p-4">
-                <div className="mb-4 border-b-2 border-gray-300 pb-2 text-lg font-bold uppercase tracking-wide text-gray-700">
+              <div className="mb-10 rounded-lg border border-white/10 bg-white/5 p-4">
+                <div className="mb-4 border-b border-white/10 pb-2 text-lg font-bold uppercase tracking-wide text-white/70">
                   Professional Experience
                 </div>
                 {experience.map((exp: ParsedExperience, index) => (
                   <div
                     key={`${exp.company ?? "company"}-${index}`}
-                    className="mb-4 rounded-lg border border-gray-300 bg-gray-50 p-4"
+                    className="mb-4 rounded-lg border border-white/10 bg-white/5 p-4"
                   >
                     <div className="flex flex-wrap items-start justify-between gap-2">
                       <div className="min-w-0">
-                        <h4 className="break-words text-base font-semibold text-gray-900">
+                        <h4 className="wrap-break-word text-base font-semibold text-white">
                           {exp.title || "(Untitled role)"}
                         </h4>
-                        <div className="mt-1 text-sm text-gray-600">
-                          <span className="font-medium text-gray-800">{exp.company || "(Company)"}</span>
-                          {exp.location ? <span className="text-gray-500"> • {exp.location}</span> : null}
+                        <div className="mt-1 text-sm text-white/70">
+                          <span className="font-medium text-white">{exp.company || "(Company)"}</span>
+                          {exp.location ? <span className="text-white/60"> • {exp.location}</span> : null}
                         </div>
                       </div>
-                      <div className="shrink-0 text-xs font-medium text-gray-500">
+                      <div className="shrink-0 text-xs font-medium text-white/60">
                         {(exp.start_date || "N/A") + " - " + (exp.end_date || "Present")}
                       </div>
                     </div>
                     {exp.highlights && exp.highlights.length > 0 && (
-                      <ul className="mt-3 list-disc space-y-1 pl-5 text-sm leading-relaxed text-gray-700">
+                      <ul className="mt-3 list-disc space-y-1 pl-5 text-sm leading-relaxed text-white/70">
                         {exp.highlights.map((highlight, i) => (
                           <li key={`${highlight}-${i}`}>{highlight}</li>
                         ))}
@@ -759,25 +761,25 @@ export default function ResultPage() {
             )}
 
             {projects.length > 0 && (
-              <div className="mb-10 rounded-lg border border-gray-300 bg-white p-4">
-                <div className="mb-4 border-b-2 border-gray-300 pb-2 text-lg font-bold uppercase tracking-wide text-gray-700">
+              <div className="mb-10 rounded-lg border border-white/10 bg-white/5 p-4">
+                <div className="mb-4 border-b border-white/10 pb-2 text-lg font-bold uppercase tracking-wide text-white/70">
                   Projects
                 </div>
                 {projects.map((project: ParsedProject, index) => (
                   <div
                     key={`${project.name ?? "project"}-${index}`}
-                    className="relative mb-6 border-l-4 border-indigo-100 pl-4"
+                    className="relative mb-6 border-l-4 border-[#3B5BFF]/30 pl-4"
                   >
-                    <h4 className="mb-1 text-lg font-semibold text-gray-900">{project.name}</h4>
-                    <div className="mb-2 text-sm text-gray-500">{project.summary}</div>
+                    <h4 className="mb-1 text-lg font-semibold text-white">{project.name}</h4>
+                    <div className="mb-2 text-sm text-white/60">{project.summary}</div>
                     {project.tech_stack && project.tech_stack.length > 0 && (
-                      <div className="mb-2 text-xs font-medium text-gray-500">
-                        <span className="font-bold text-gray-700">Stack:</span>{" "}
+                      <div className="mb-2 text-xs font-medium text-white/60">
+                        <span className="font-bold text-white/80">Stack:</span>{" "}
                         {project.tech_stack.join(", ")}
                       </div>
                     )}
                     {project.highlights && project.highlights.length > 0 && (
-                      <ul className="mt-2 pl-2 text-sm leading-relaxed text-gray-600">
+                      <ul className="mt-2 pl-2 text-sm leading-relaxed text-white/70">
                         {project.highlights.map((highlight, i) => (
                           <li key={`${highlight}-${i}`} className="mb-1">
                             • {highlight}
@@ -793,7 +795,7 @@ export default function ResultPage() {
                         <div key={`${link}-${i}`}>
                           <a
                             href={href}
-                            className="mt-1 block text-xs text-blue-600 hover:underline"
+                            className="mt-1 block text-xs text-[#3B5BFF] hover:underline"
                             target="_blank"
                             rel="noreferrer"
                           >
@@ -808,17 +810,17 @@ export default function ResultPage() {
             )}
 
             {education.length > 0 && (
-              <div className="mb-10 rounded-lg border border-gray-300 bg-white p-4">
-                <div className="mb-4 border-b-2 border-gray-300 pb-2 text-lg font-bold uppercase tracking-wide text-gray-700">
+              <div className="mb-10 rounded-lg border border-white/10 bg-white/5 p-4">
+                <div className="mb-4 border-b border-white/10 pb-2 text-lg font-bold uppercase tracking-wide text-white/70">
                   Education
                 </div>
                 {education.map((edu: ParsedEducation, index) => (
                   <div
                     key={`${edu.school ?? "school"}-${index}`}
-                    className="relative mb-6 border-l-4 border-blue-300 pl-4"
+                    className="relative mb-6 border-l-4 border-[#3B5BFF]/30 pl-4"
                   >
-                    <h4 className="mb-1 text-lg font-semibold text-gray-900">{edu.school}</h4>
-                    <div className="text-sm text-gray-500">
+                    <h4 className="mb-1 text-lg font-semibold text-white">{edu.school}</h4>
+                    <div className="text-sm text-white/60">
                       {edu.degree} {edu.field && `in ${edu.field}`} • {edu.start_year} - {edu.end_year}
                     </div>
                   </div>
@@ -827,24 +829,24 @@ export default function ResultPage() {
             )}
 
             <div className="mb-10">
-              <details className="overflow-hidden rounded-md border border-gray-300">
-                <summary className="cursor-pointer bg-gray-50 p-4 font-semibold text-gray-700 hover:bg-gray-100">
+              <details className="overflow-hidden rounded-md border border-white/10 bg-white/5">
+                <summary className="cursor-pointer bg-white/5 p-4 font-semibold text-white/80 hover:bg-white/10">
                   View Raw Extracted Text
                 </summary>
-                <pre className="overflow-x-auto whitespace-pre-wrap bg-white p-4 text-xs text-gray-500">
+                <pre className="overflow-x-auto whitespace-pre-wrap bg-white/5 p-4 text-xs text-white/60">
                   {resume.raw_text}
                 </pre>
               </details>
             </div>
 
-            <div className="mb-10 rounded-lg border border-gray-300 bg-white">
-              <div className="flex flex-col gap-3 border-b border-gray-300 p-4 sm:flex-row sm:items-center sm:justify-between">
-                <h3 className="text-base font-semibold text-gray-900">Profile Exports</h3>
+            <div className="mb-10 rounded-lg border border-white/10 bg-white/5">
+              <div className="flex flex-col gap-3 border-b border-white/10 p-4 sm:flex-row sm:items-center sm:justify-between">
+                <h3 className="text-base font-semibold text-white">Profile Exports</h3>
                 <button
                   type="button"
                   onClick={handleGenerateExports}
                   disabled={isExporting}
-                  className="inline-flex h-10 items-center justify-center rounded-lg bg-[#032b2b] px-4 text-sm font-semibold text-white hover:bg-[#043d3d] disabled:cursor-not-allowed disabled:opacity-60"
+                  className="inline-flex h-10 items-center justify-center rounded-lg bg-[#3B5BFF] px-4 text-sm font-semibold text-white hover:bg-[#2F4CF5] disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {isExporting ? "Generating..." : "Generate Exports"}
                 </button>
@@ -854,8 +856,8 @@ export default function ResultPage() {
                 <div
                   className={`mx-4 mt-4 rounded-lg border px-3 py-2 text-sm ${
                     exportError
-                      ? "border-red-200 bg-red-50 text-red-700"
-                      : "border-emerald-200 bg-emerald-50 text-emerald-700"
+                      ? "border-red-500/30 bg-red-500/10 text-red-200"
+                      : "border-emerald-500/30 bg-emerald-500/10 text-emerald-200"
                   }`}
                 >
                   {exportError ?? copyStatus}
@@ -863,15 +865,15 @@ export default function ResultPage() {
               )}
 
               <div className="space-y-4 p-4">
-                <div className="rounded-lg border border-gray-300">
-                  <div className="flex flex-col gap-2 border-b border-gray-300 p-3 sm:flex-row sm:items-center sm:justify-between">
-                    <p className="text-sm font-semibold text-gray-800">Generated CV (PDF)</p>
+                <div className="rounded-lg border border-white/10 bg-white/5">
+                  <div className="flex flex-col gap-2 border-b border-white/10 p-3 sm:flex-row sm:items-center sm:justify-between">
+                    <p className="text-sm font-semibold text-white">Generated CV (PDF)</p>
                     <div className="flex gap-2">
                       <button
                         type="button"
                         onClick={() => handleCopy(cvMarkdown, "CV")}
                         disabled={!cvMarkdown}
-                        className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+                        className="rounded-md border border-white/15 bg-white/5 px-3 py-1.5 text-xs font-semibold text-white hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60"
                       >
                         Copy Text
                       </button>
@@ -879,26 +881,26 @@ export default function ResultPage() {
                         type="button"
                         onClick={handleDownloadCvPdf}
                         disabled={!cvMarkdown}
-                        className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+                        className="rounded-md border border-white/15 bg-white/5 px-3 py-1.5 text-xs font-semibold text-white hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60"
                       >
                         Download PDF
                       </button>
                     </div>
                   </div>
-                  <pre className="max-h-72 overflow-auto whitespace-pre-wrap p-3 text-xs text-gray-700">
+                  <pre className="max-h-72 overflow-auto whitespace-pre-wrap p-3 text-xs text-white/70">
                     {cvMarkdown || "No CV export yet. Click \"Generate Exports\"."}
                   </pre>
                 </div>
 
-                <div className="rounded-lg border border-gray-300">
-                  <div className="flex flex-col gap-2 border-b border-gray-300 p-3 sm:flex-row sm:items-center sm:justify-between">
-                    <p className="text-sm font-semibold text-gray-800">GitHub README Export</p>
+                <div className="rounded-lg border border-white/10 bg-white/5">
+                  <div className="flex flex-col gap-2 border-b border-white/10 p-3 sm:flex-row sm:items-center sm:justify-between">
+                    <p className="text-sm font-semibold text-white">GitHub README Export</p>
                     <div className="flex gap-2">
                       <button
                         type="button"
                         onClick={() => handleCopy(githubReadme, "README")}
                         disabled={!githubReadme}
-                        className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+                        className="rounded-md border border-white/15 bg-white/5 px-3 py-1.5 text-xs font-semibold text-white hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60"
                       >
                         Copy
                       </button>
@@ -906,13 +908,13 @@ export default function ResultPage() {
                         type="button"
                         onClick={handleDownloadReadme}
                         disabled={!githubReadme}
-                        className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+                        className="rounded-md border border-white/15 bg-white/5 px-3 py-1.5 text-xs font-semibold text-white hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60"
                       >
                         Download
                       </button>
                     </div>
                   </div>
-                  <pre className="max-h-72 overflow-auto whitespace-pre-wrap p-3 text-xs text-gray-700">
+                  <pre className="max-h-72 overflow-auto whitespace-pre-wrap p-3 text-xs text-white/70">
                     {githubReadme || "No README export yet. Click \"Generate Exports\"."}
                   </pre>
                 </div>
@@ -920,8 +922,8 @@ export default function ResultPage() {
             </div>
           </div>
 
-          <div className="border-t border-gray-300 bg-gray-50 p-5 sm:p-6 md:border-l md:border-t-0 md:p-8">
-            <div className="mb-8 rounded-lg border border-gray-300 bg-white p-6 text-center shadow-sm">
+          <div className="border-t border-white/10 bg-white/5 p-5 sm:p-6 md:border-l md:border-t-0 md:p-8">
+            <div className="mb-8 rounded-lg border border-white/10 bg-white/5 p-6 text-center shadow-[0_18px_30px_rgba(0,0,0,0.35)]">
               <div
                 className={`mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full text-2xl font-extrabold text-white ${getScoreColor(
                   score
@@ -929,13 +931,13 @@ export default function ResultPage() {
               >
                 {score}
               </div>
-              <h4 className="m-0 mb-3 font-bold text-gray-800">Resume Health</h4>
+              <h4 className="m-0 mb-3 font-bold text-white">Resume Health</h4>
 
               <div className="text-left text-sm">
                 {(resume.resume_health?.strengths?.length ?? 0) > 0 && (
                   <div className="mb-4">
-                    <strong className="mb-1 block text-emerald-600">Strengths</strong>
-                    <ul className="list-disc space-y-1 pl-4 text-gray-600">
+                    <strong className="mb-1 block text-emerald-300">Strengths</strong>
+                    <ul className="list-disc space-y-1 pl-4 text-white/70">
                       {resume.resume_health.strengths?.slice(0, 3).map((strength, i) => (
                         <li key={`${strength}-${i}`}>{strength}</li>
                       ))}
@@ -944,8 +946,8 @@ export default function ResultPage() {
                 )}
                 {(resume.resume_health?.suggestions?.length ?? 0) > 0 && (
                   <div>
-                    <strong className="mb-1 block text-amber-600">Improvements</strong>
-                    <ul className="list-disc space-y-1 pl-4 text-gray-600">
+                    <strong className="mb-1 block text-amber-300">Improvements</strong>
+                    <ul className="list-disc space-y-1 pl-4 text-white/70">
                       {resume.resume_health.suggestions?.slice(0, 3).map((suggestion, i) => (
                         <li key={`${suggestion}-${i}`}>{suggestion}</li>
                       ))}
@@ -956,16 +958,16 @@ export default function ResultPage() {
             </div>
 
             <div className="mb-10">
-              <div className="mb-4 border-b border-gray-300 pb-2 text-sm font-bold uppercase tracking-wide text-gray-700">
+              <div className="mb-4 border-b border-white/10 pb-2 text-sm font-bold uppercase tracking-wide text-white/70">
                 Contact Details
               </div>
               <div className="space-y-3">
-                <p className="flex items-center gap-2 text-sm text-gray-600">
-                  <span className="min-w-[60px] font-semibold text-gray-800">Email:</span>
+                <p className="flex items-center gap-2 text-sm text-white/70">
+                  <span className="min-w-15 font-semibold text-white/80">Email:</span>
                   <span className="truncate">{contact.email ?? "N/A"}</span>
                 </p>
-                <p className="flex items-center gap-2 text-sm text-gray-600">
-                  <span className="min-w-[60px] font-semibold text-gray-800">Phone:</span>
+                <p className="flex items-center gap-2 text-sm text-white/70">
+                  <span className="min-w-15 font-semibold text-white/80">Phone:</span>
                   <span>{contact.phone || "N/A"}</span>
                 </p>
 
@@ -978,13 +980,13 @@ export default function ResultPage() {
                     if (!href) return null;
 
                     return (
-                      <p key={`${key}-${index}`} className="flex items-center gap-2 text-sm text-gray-600">
-                        <span className="min-w-[60px] capitalize font-semibold text-gray-800">{key}:</span>
+                      <p key={`${key}-${index}`} className="flex items-center gap-2 text-sm text-white/70">
+                        <span className="min-w-15 capitalize font-semibold text-white/80">{key}:</span>
                         <a
                           href={href}
                           target="_blank"
                           rel="noreferrer"
-                          className="max-w-[150px] truncate text-blue-600 hover:underline"
+                          className="max-w-37.5 truncate text-[#3B5BFF] hover:underline"
                         >
                           {linkUrl}
                         </a>
@@ -996,20 +998,20 @@ export default function ResultPage() {
             </div>
 
             <div className="mb-10">
-              <div className="mb-4 border-b border-gray-300 pb-2 text-sm font-bold uppercase tracking-wide text-gray-700">
+              <div className="mb-4 border-b border-white/10 pb-2 text-sm font-bold uppercase tracking-wide text-white/70">
                 Skills Detected
               </div>
               {Object.entries(skillsByCategory).map(([category, categorySkills]) =>
                 categorySkills.length > 0 ? (
                   <div key={category} className="mb-4">
-                    <div className="mb-2 text-xs font-semibold uppercase text-gray-500">
+                    <div className="mb-2 text-xs font-semibold uppercase text-white/50">
                       {category.replace("_", " ")}
                     </div>
                     <div className="flex flex-wrap gap-2">
                       {categorySkills.map((skill, index) => (
                         <span
                           key={`${skill}-${index}`}
-                          className="inline-block rounded-md border border-indigo-100 bg-indigo-50 px-3 py-1 text-xs font-medium text-indigo-700"
+                          className="inline-block rounded-md border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-white/70"
                         >
                           {skill}
                         </span>
