@@ -726,7 +726,7 @@ export default function ResultPage() {
 
             {experience.length > 0 && (
               <div className="mb-10 rounded-lg border border-white/10 bg-white/5 p-4">
-                <div className="mb-4 border-b border-white/10 pb-2 text-lg font-bold uppercase tracking-wide text-white/70">
+                <div className="mb-4 border-b border-[#27C93F]/30 pb-2 text-lg font-bold uppercase tracking-wide text-[#27C93F]">
                   Professional Experience
                 </div>
                 {experience.map((exp: ParsedExperience, index) => (
@@ -762,13 +762,13 @@ export default function ResultPage() {
 
             {projects.length > 0 && (
               <div className="mb-10 rounded-lg border border-white/10 bg-white/5 p-4">
-                <div className="mb-4 border-b border-white/10 pb-2 text-lg font-bold uppercase tracking-wide text-white/70">
+                <div className="mb-4 border-b border-[#FFBD2E]/30 pb-2 text-lg font-bold uppercase tracking-wide text-[#FFBD2E]">
                   Projects
                 </div>
                 {projects.map((project: ParsedProject, index) => (
                   <div
                     key={`${project.name ?? "project"}-${index}`}
-                    className="relative mb-6 border-l-4 border-[#3B5BFF]/30 pl-4"
+                    className="relative mb-6 border-l-4 border-[#FFBD2E]/40 pl-4"
                   >
                     <h4 className="mb-1 text-lg font-semibold text-white">{project.name}</h4>
                     <div className="mb-2 text-sm text-white/60">{project.summary}</div>
@@ -795,7 +795,7 @@ export default function ResultPage() {
                         <div key={`${link}-${i}`}>
                           <a
                             href={href}
-                            className="mt-1 block text-xs text-[#3B5BFF] hover:underline"
+                            className="mt-1 block text-xs text-[#FFBD2E] hover:underline"
                             target="_blank"
                             rel="noreferrer"
                           >
@@ -811,13 +811,13 @@ export default function ResultPage() {
 
             {education.length > 0 && (
               <div className="mb-10 rounded-lg border border-white/10 bg-white/5 p-4">
-                <div className="mb-4 border-b border-white/10 pb-2 text-lg font-bold uppercase tracking-wide text-white/70">
+                <div className="mb-4 border-b border-[#FF5F56]/30 pb-2 text-lg font-bold uppercase tracking-wide text-[#FF5F56]">
                   Education
                 </div>
                 {education.map((edu: ParsedEducation, index) => (
                   <div
                     key={`${edu.school ?? "school"}-${index}`}
-                    className="relative mb-6 border-l-4 border-[#3B5BFF]/30 pl-4"
+                    className="relative mb-6 border-l-4 border-[#FF5F56]/40 pl-4"
                   >
                     <h4 className="mb-1 text-lg font-semibold text-white">{edu.school}</h4>
                     <div className="text-sm text-white/60">
