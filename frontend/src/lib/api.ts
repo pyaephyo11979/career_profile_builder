@@ -326,6 +326,10 @@ export async function getResumeExports(id: string | number): Promise<ResumeExpor
   return apiRequest<ResumeExportsResponse>(`/api/resumes/${id}/exports/`, { method: "GET" }, true);
 }
 
+export async function deleteResume(id: string | number): Promise<void> {
+  return apiRequest<void>(`/api/resumes/${id}/`, { method: "DELETE" }, true);
+}
+
 export type ResumeUpdatePayload = {
   parsed_data?: ParsedResumeData;
   resume_health?: ResumeHealth;

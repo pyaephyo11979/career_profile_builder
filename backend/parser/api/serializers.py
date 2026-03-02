@@ -39,6 +39,8 @@ class ResumeUpdateSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         parsed_data = validated_data.get("parsed_data")
-        if parsed_data is not None and "resume_health" not in validated_data:
-            validated_data["resume_health"] = score_resume(parsed_data)
+        if parsed_data is not None:
+            if "resume_health" not in validated_data:
+                validated_data["resume_health"] = score_resume(parsed_data)
+            validated_data["parsed_data"] = {**parsed_data, "resume_health": validated_data["resume_health"]}
         return super().update(instance, validated_data)

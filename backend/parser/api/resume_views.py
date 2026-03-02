@@ -9,7 +9,7 @@ class ResumeListView(generics.ListAPIView):
     def get_queryset(self):
         return Resume.objects.filter(user=self.request.user).order_by("-created_at")
 
-class ResumeDetailView(generics.RetrieveAPIView):
+class ResumeDetailView(generics.RetrieveDestroyAPIView):
     serializer_class = ResumeCreateSerializer
     permission_classes = [permissions.IsAuthenticated]
 

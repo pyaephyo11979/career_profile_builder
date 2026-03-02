@@ -1,12 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-import { getAccessTokenUsername, getResumes, type ResumeRecord } from "../lib/api";
+import { deleteResume, getAccessTokenUsername, getResumes, type ResumeRecord } from "../lib/api";
 
 export default function ProfilePage() {
   const [resumes, setResumes] = useState<ResumeRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [deletingResumeId, setDeletingResumeId] = useState<number | null>(null);
   const auth = useAuth();
   const navigate = useNavigate();
 
@@ -42,6 +44,23 @@ export default function ProfilePage() {
     };
   }, [auth, navigate]);
 
+  const handleDeleteResume = async (resumeId: number, fileName: string) => {
+    const confirmed = window.confirm(`Delete parsed resume "${fileName}"? This cannot be undone.`);
+    if (!confirmed) return;
+
+    setDeleteError(null);
+    setDeletingResumeId(resumeId);
+    try {
+      await deleteResume(resumeId);
+      setResumes((prev) => prev.filter((item) => item.id !== resumeId));
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to delete resume.";
+      setDeleteError(message);
+    } finally {
+      setDeletingResumeId(null);
+    }
+  };
+
   return (
     <div className="min-h-[calc(100vh-96px)] bg-transparent px-4 py-6 text-white sm:px-6 md:py-10">
       <div className="mx-auto max-w-5xl space-y-6">
@@ -75,6 +94,7 @@ export default function ProfilePage() {
 
           {loading && <p className="text-sm text-white/60">Loading your resumes...</p>}
           {error && <p className="text-sm text-red-200">Error: {error}</p>}
+          {deleteError && <p className="text-sm text-red-200">Error: {deleteError}</p>}
 
           {!loading && !error && resumes.length === 0 && (
             <div className="rounded-xl border border-dashed border-white/15 bg-white/5 p-6 text-center">
@@ -88,23 +108,32 @@ export default function ProfilePage() {
           {!loading && !error && resumes.length > 0 && (
             <div className="space-y-3">
               {resumes.map((resume) => (
-                <Link
+                <div
                   key={resume.id}
-                  to={`/resumes/${resume.id}`}
-                  className="block rounded-xl border border-white/10 bg-white/5 p-4 transition-colors hover:border-white/15 hover:bg-white/10"
+                  className="rounded-xl border border-white/10 bg-white/5 p-4 transition-colors hover:border-white/15 hover:bg-white/10"
                 >
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                    <div>
+                    <Link to={`/resumes/${resume.id}`} className="min-w-0 flex-1">
                       <p className="truncate text-sm font-semibold text-white">{resume.file_name}</p>
                       <p className="text-xs text-white/60">
                         Uploaded {new Date(resume.created_at).toLocaleDateString()}
                       </p>
+                    </Link>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs font-medium text-white/70">
+                        Score: {resume.resume_health?.score ?? 0}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteResume(resume.id, resume.file_name)}
+                        disabled={deletingResumeId === resume.id}
+                        className="inline-flex h-9 items-center justify-center rounded-lg border border-red-400/40 bg-red-500/10 px-3 text-xs font-semibold text-red-100 hover:bg-red-500/20 disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        {deletingResumeId === resume.id ? "Deleting..." : "Delete"}
+                      </button>
                     </div>
-                    <span className="text-xs font-medium text-white/70">
-                      Score: {resume.resume_health?.score ?? 0}
-                    </span>
                   </div>
-                </Link>
+                </div>
               ))}
             </div>
           )}

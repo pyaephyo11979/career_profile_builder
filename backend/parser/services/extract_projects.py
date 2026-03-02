@@ -96,5 +96,8 @@ def _commit(collection: List[Dict[str, Any]], project: Dict[str, Any]) -> None:
 
 def _extract_stack(text: str) -> List[str]:
     lower = text.lower()
-    found = {display for key, display in _TECH_LOOKUP.items() if key in lower}
+    found = set()
+    for key, display in _TECH_LOOKUP.items():
+        if re.search(rf"(^|[^a-z0-9]){re.escape(key)}([^a-z0-9]|$)", lower):
+            found.add(display)
     return sorted(found)

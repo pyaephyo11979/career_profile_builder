@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import {
+  deleteResume,
   getResumeById,
   getResumeExports,
   updateResume,
@@ -171,8 +172,10 @@ export default function ResultPage() {
   const [copyStatus, setCopyStatus] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [editError, setEditError] = useState<string | null>(null);
   const [editStatus, setEditStatus] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
   const [editDraft, setEditDraft] = useState<ParsedResumeData>({});
 
   const resumeId = useMemo(() => {
@@ -318,6 +321,23 @@ export default function ResultPage() {
     downloadFile(buildPdfFromText(cvMarkdown), "CV.pdf");
   };
 
+  const handleDeleteResume = async () => {
+    if (!resumeId || !resume) return;
+    const confirmed = window.confirm(`Delete parsed resume "${resume.file_name}"? This cannot be undone.`);
+    if (!confirmed) return;
+
+    setDeleteError(null);
+    setIsDeleting(true);
+    try {
+      await deleteResume(resumeId);
+      navigate("/profile", { replace: true });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to delete resume.";
+      setDeleteError(message);
+      setIsDeleting(false);
+    }
+  };
+
   const updateContactField = (field: "name" | "email" | "phone", value: string) => {
     setEditDraft((prev) => ({
       ...prev,
@@ -445,16 +465,31 @@ export default function ResultPage() {
               {resume.created_at ? new Date(resume.created_at).toLocaleDateString() : "N/A"}
             </div>
           </div>
-          <span
-            className={`inline-block rounded-full px-3 py-1 text-sm font-medium ${
-              resume.is_confirmed
-                ? "border border-emerald-500/30 bg-emerald-500/10 text-emerald-200"
-                : "border border-white/10 bg-white/10 text-white/70"
-            }`}
-          >
-            {resume.is_confirmed ? "Confirmed Quote" : "Analysis Pending"}
-          </span>
+          <div className="flex items-center gap-2">
+            <span
+              className={`inline-block rounded-full px-3 py-1 text-sm font-medium ${
+                resume.is_confirmed
+                  ? "border border-emerald-500/30 bg-emerald-500/10 text-emerald-200"
+                  : "border border-white/10 bg-white/10 text-white/70"
+              }`}
+            >
+              {resume.is_confirmed ? "Confirmed Quote" : "Analysis Pending"}
+            </span>
+            <button
+              type="button"
+              onClick={handleDeleteResume}
+              disabled={isDeleting}
+              className="inline-flex h-9 items-center justify-center rounded-lg border border-red-400/40 bg-red-500/10 px-3 text-xs font-semibold text-red-100 hover:bg-red-500/20 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {isDeleting ? "Deleting..." : "Delete Resume"}
+            </button>
+          </div>
         </div>
+        {deleteError && (
+          <div className="mx-5 mt-3 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-200 sm:mx-6 md:mx-8">
+            {deleteError}
+          </div>
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-[1fr_340px]">
           <div className="p-5 sm:p-6 md:p-8">

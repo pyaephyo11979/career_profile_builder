@@ -39,9 +39,9 @@ class ResumeParser:
         skills_section_lines = self._sections.get("skills")
         skills = self.skills_extractor(normalized_lines, skills_section_lines)
 
-        education = self.education_extractor(self._sections.get("education", []))
-        experience = self.experience_extractor(self._sections.get("experience", []))
-        projects = self.projects_extractor(self._sections.get("projects", []))
+        education = self.education_extractor(self._section_lines("education"))
+        experience = self.experience_extractor(self._section_lines("experience"))
+        projects = self.projects_extractor(self._section_lines("projects"))
 
         profile: Dict[str, Any] = {
             "contact": {
@@ -60,6 +60,13 @@ class ResumeParser:
 
         profile["resume_health"] = self.health_scorer(profile)
         return profile
+
+    def _section_lines(self, name: str) -> List[str]:
+        section = self._sections.get(name)
+        if section:
+            return section
+        # Fallback to unknown content when explicit headers are missing.
+        return self._sections.get("unknown", [])
 
 
 def parse_resume(lines: List[str]) -> Dict[str, Any]:
