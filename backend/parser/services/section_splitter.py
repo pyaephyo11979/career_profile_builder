@@ -1,6 +1,7 @@
 import json
 import os
-from typing import Dict,List
+import re
+from typing import Dict, List
 
 def _load_headers() -> Dict[str, List[str]]:
     here = os.path.dirname(__file__)
@@ -9,12 +10,16 @@ def _load_headers() -> Dict[str, List[str]]:
         return json.load(f)
     
 HEADERS = _load_headers()
+HEADERS_COMPACT = {
+    section: {v.lower() for v in variants} | {re.sub(r"[^a-z]", "", v.lower()) for v in variants}
+    for section, variants in HEADERS.items()
+}
 
 def _is_header(line: str)-> str | None:
-    norm = line.strip().lower()
-    norm = norm.replace(':',"")
-    for section,variants in HEADERS.items():
-        if norm in variants:
+    norm = line.strip().lower().rstrip(":")
+    compact = re.sub(r"[^a-z]", "", norm)
+    for section, variants in HEADERS_COMPACT.items():
+        if norm in variants or compact in variants:
             return section
     return None
 

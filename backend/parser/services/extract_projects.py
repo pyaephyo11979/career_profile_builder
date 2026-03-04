@@ -36,8 +36,16 @@ def extract_projects(lines: List[str] | None) -> List[Dict[str, Any]]:
                 current = _blank_project()
             continue
 
-        if URL_RE.search(line):
-            current["links"].extend(URL_RE.findall(line))
+        urls = URL_RE.findall(line)
+        if urls:
+            current["links"].extend(urls)
+            remainder = URL_RE.sub("", line).strip(" -–—|:")
+            if remainder:
+                if current["name"] is None:
+                    current["name"] = remainder
+                else:
+                    current["summary"] = f"{current['summary']} {remainder}".strip() if current["summary"] else remainder
+                current["tech_stack"].extend(_extract_stack(remainder))
             continue
 
         if line.startswith(tuple("-*•")):

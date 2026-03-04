@@ -5,6 +5,7 @@ from .section_splitter import HEADERS
 
 BULLETS= ['•', '-', '*', '‣', '◦', '▪', '_', '·']
 HEADER_VARIANTS = {variant.lower() for values in HEADERS.values() for variant in values}
+BROKEN_HEADER_RE = re.compile(r"^(?:[A-Za-z]\s+){2,}[A-Za-z]$")
 NAME_TOKEN_RE = re.compile(r"^[A-Za-z][A-Za-z'.-]{0,18}$")
 
 
@@ -35,6 +36,13 @@ def preprocess(raw_text: str) -> List[str]:
 
     lines = [ln.strip() for ln in text.split("\n")]
     lines = [ln for ln in lines if ln]
+
+    def _unsplit(line: str) -> str:
+        if BROKEN_HEADER_RE.match(line):
+            return line.replace(" ", "")
+        return line
+
+    lines = [_unsplit(ln) for ln in lines]
 
     joined: list[str] = []
     i=0
